@@ -34,6 +34,10 @@ Available playbooks:
 - "segment_comparison": Compare two cohorts (e.g. outcome=1 vs outcome=0) on a key metric.
 - "outcome_breakdown": Show how often each outcome/target class occurs (class balance).
 - "feature_outcome_profile": Show how outcome rate changes across the range of a numeric feature.
+
+You can also set numeric detail parameters when relevant:
+- "top_n": how many top items to show (e.g. top 10 correlated features).
+- "bins": how many bins to use for histograms / profiles (e.g. 20 bins).
 """
 
         prompt = f"""You are an analysis planner. Your job is to choose ONE analysis playbook
@@ -52,6 +56,8 @@ Return a JSON object ONLY, with this structure:
   "target": "column_name or null",              // for correlation, outcome_breakdown & feature_outcome_profile
   "feature": "column_name or null",             // for distribution & feature_outcome_profile (numeric)
   "segment_column": "column_name or null",      // for segment_comparison (categorical/boolean)
+  "top_n": number or null,                      // for correlation or any ranking-style output
+  "bins": number or null,                       // for distribution / feature_outcome_profile
   "mode": "quick" | "deep"
 }}
 
@@ -62,6 +68,8 @@ Rules:
 - Use "segment_comparison" when the user asks to compare two groups or cohorts (e.g. outcome=1 vs outcome=0, men vs women).
 - Use "outcome_breakdown" when the user asks how often the outcome/target occurs, or for class balance / base rate.
 - Use "feature_outcome_profile" when the user asks how the outcome changes as a feature increases/decreases (e.g. outcome vs glucose levels).
+- When the user mentions a specific count like "top 3" or "top 10", set "top_n" accordingly (within 3-20).
+- When the user asks for more or fewer "buckets" / "ranges" / "granularity", adjust "bins" between 5 and 30.
 - For "correlation", choose a numeric column that looks like the outcome/target (e.g., a binary label) if possible.
 - Default mode is "quick" unless the user clearly asks for very detailed or deep analysis.
 - If you are unsure of a column to use for a given playbook, set its field to null and let the backend fall back safely.
@@ -93,6 +101,8 @@ Rules:
         target = response.get("target")
         feature = response.get("feature")
         segment_column = response.get("segment_column")
+        top_n = response.get("top_n")
+        bins = response.get("bins")
         mode = response.get("mode", "quick")
 
         # Basic validation and fallbacks
@@ -119,12 +129,27 @@ Rules:
                 if target:
                     break
 
+        # Clamp numeric detail parameters to reasonable ranges
+        if isinstance(top_n, (int, float)):
+            # allow between 3 and 50
+            top_n = max(3, min(int(top_n), 50))
+        else:
+            top_n = None
+
+        if isinstance(bins, (int, float)):
+            # allow between 5 and 50
+            bins = max(5, min(int(bins), 50))
+        else:
+            bins = None
+
         # Final, fully validated analysis request
         return {
             "playbook": playbook,
             "target": target,
             "feature": feature,
             "segment_column": segment_column,
+            "top_n": top_n,
+            "bins": bins,
             "mode": mode,
         }
 
