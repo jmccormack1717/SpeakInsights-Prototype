@@ -22,7 +22,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
   const { type, data, config: chartConfig } = config;
 
   // Prepare data for Recharts
-  const chartData = prepareChartData(data, type, config.metadata);
+  const chartData = prepareChartData(data, type);
 
   switch (type) {
     case 'bar':
@@ -87,7 +87,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
                 fill="#8884d8"
                 dataKey="value"
               >
-                {chartData.map((entry: any, index: number) => (
+                {chartData.map((_, index: number) => (
                   <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
@@ -172,8 +172,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
 
 function prepareChartData(
   data: any,
-  type: string,
-  metadata?: any
+  type: string
 ): any[] {
   if (type === 'bar' || type === 'horizontal_bar') {
     return data.labels?.map((label: string, idx: number) => ({

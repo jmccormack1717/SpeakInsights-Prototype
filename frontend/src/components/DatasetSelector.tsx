@@ -1,6 +1,6 @@
 /** Dataset selector component */
 import { useEffect, useState, useRef } from 'react';
-import { Database, Plus, Trash2, Upload, X } from 'lucide-react';
+import { Database, Plus, Trash2, Upload } from 'lucide-react';
 import { useQueryStore } from '../stores/queryStore';
 import { datasetApi } from '../services/api';
 
