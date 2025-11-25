@@ -70,6 +70,15 @@ Rules:
 
         response = await self.llm.generate_json(messages, temperature=0.2)
 
+        # Ensure we got a dictionary back; fall back to a safe default otherwise
+        if not isinstance(response, dict):
+            self.logger.error(f"select_analysis: LLM returned non-dict: {response!r}")
+            return {
+                "playbook": "overview",
+                "target": None,
+                "mode": "quick",
+            }
+
         playbook = response.get("playbook", "overview")
         target = response.get("target")
         mode = response.get("mode", "quick")

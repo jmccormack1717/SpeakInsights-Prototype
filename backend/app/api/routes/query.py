@@ -89,6 +89,14 @@ async def execute_query(request: QueryRequest):
                 detail=f"Failed to plan analysis: {str(e)}",
             )
 
+        # Extra safety: ensure we have a dict to avoid NoneType errors
+        if not isinstance(analysis_request, dict):
+            logger.error(f"select_analysis returned invalid value: {analysis_request!r}")
+            raise HTTPException(
+                status_code=500,
+                detail="Failed to plan analysis: invalid planner response",
+            )
+
         playbook_name = analysis_request.get("playbook", "overview")
         target = analysis_request.get("target")
         mode = analysis_request.get("mode", "quick")
