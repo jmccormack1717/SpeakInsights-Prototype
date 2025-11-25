@@ -6,6 +6,8 @@ from app.services.query_service import QueryService
 from app.services.data_analysis_service import DataAnalysisService
 from app.services.viz_service import VisualizationService
 from app.services.analysis_service import AnalysisService
+from app.services import playbooks
+import pandas as pd
 from app.core.database import db_manager
 
 
@@ -116,12 +118,85 @@ async def execute_query(request: QueryRequest):
         except Exception as e:
             logger.error(f"Failed to analyze data structure: {str(e)}")
             data_structure = {}
-        
-        # Step 5: Select visualization
+
+        # Step 5: Use playbooks for specific intents (e.g., overview, correlation)
+        primary_intent = (intent or {}).get("primary_intent", "").lower()
+
+        # Default: no playbook used
+        visualization = None
+        textual_analysis = None
+        df = pd.DataFrame(results)
+
+        # Correlation playbook: top features related to outcome
+        if primary_intent == "correlation":
+            play = playbooks.correlation_playbook(df, outcome="Outcome")
+            visualization = play["visualization"]
+            analysis_context = play.get("analysis_context", {})
+            merged_structure = {**data_structure, **analysis_context}
+
+            try:
+                textual_analysis = await analysis_service.generate_insights(
+                    request.query,
+                    results,
+                    sql,
+                    merged_structure
+                )
+            except Exception as e:
+                logger.error(f"Failed to generate analysis: {str(e)}")
+                textual_analysis = {
+                    "summary": "Analysis of feature relationships completed.",
+                    "key_findings": [],
+                    "patterns": [],
+                    "recommendations": []
+                }
+
+            return QueryResponse(
+                sql=sql,
+                results=results,
+                visualization=visualization,
+                analysis=textual_analysis,
+                data_structure=merged_structure
+            )
+
+        # Overview / describe-dataset playbook
+        if primary_intent == "overview":
+            play = playbooks.overview_playbook(df)
+            visualization = play["visualization"]
+
+            # Merge extra context into data_structure for richer analysis
+            analysis_context = play.get("analysis_context", {})
+            merged_structure = {**data_structure, **analysis_context}
+
+            try:
+                textual_analysis = await analysis_service.generate_insights(
+                    request.query,
+                    results,
+                    sql,
+                    merged_structure
+                )
+            except Exception as e:
+                logger.error(f"Failed to generate analysis: {str(e)}")
+                textual_analysis = {
+                    "summary": f"Dataset has {merged_structure.get('row_count', len(results))} rows and "
+                               f"{merged_structure.get('column_count', len(results[0]) if results else 0)} columns.",
+                    "key_findings": [],
+                    "patterns": [],
+                    "recommendations": []
+                }
+
+            return QueryResponse(
+                sql=sql,
+                results=results,
+                visualization=visualization,
+                analysis=textual_analysis,
+                data_structure=merged_structure
+            )
+
+        # Step 5 (fallback): Select visualization using generic rules
         try:
             chart_config = viz_service.select_chart_type(intent, data_structure)
             formatted_data = viz_service.format_data_for_chart(results, chart_config)
-            
+
             visualization = {
                 "type": chart_config.get("type"),
                 "data": formatted_data,
@@ -145,7 +220,7 @@ async def execute_query(request: QueryRequest):
                 "config": {},
                 "metadata": {}
             }
-        
+
         # Step 6: Generate analysis
         try:
             textual_analysis = await analysis_service.generate_insights(
@@ -163,7 +238,7 @@ async def execute_query(request: QueryRequest):
                 "patterns": [],
                 "recommendations": []
             }
-        
+
         return QueryResponse(
             sql=sql,
             results=results,

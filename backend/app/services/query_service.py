@@ -30,10 +30,36 @@ class QueryService:
         """
         schema_context = build_schema_context(schema_info)
         table_names = get_table_names(schema_info)
+
+        # Detect common "describe/overview" style questions
+        lower_query = user_query.lower()
+        overview_keywords = [
+            "describe the dataset",
+            "describe dataset",
+            "dataset overview",
+            "overview of the dataset",
+            "what is in this dataset",
+            "what does this dataset contain",
+            "describe the data",
+            "data overview",
+        ]
+        is_overview_query = any(k in lower_query for k in overview_keywords)
+
+        # Detect correlation / collinearity style questions
+        correlation_keywords = [
+            "correlation",
+            "correlated",
+            "correlate",
+            "collinearity",
+            "colinear",
+            "most related to",
+            "related to outcome",
+        ]
+        is_correlation_query = any(k in lower_query for k in correlation_keywords)
         
         # For schema-related queries, provide better guidance
         schema_query_keywords = ['feature', 'column', 'field', 'attribute', 'schema', 'structure', 'what data', 'what information']
-        is_schema_query = any(keyword in user_query.lower() for keyword in schema_query_keywords)
+        is_schema_query = any(keyword in lower_query for keyword in schema_query_keywords)
         
         schema_guidance = ""
         if is_schema_query and table_names:
@@ -138,13 +164,24 @@ Generate a corrected SQL query:"""
                 sql = response.get("sql", "").strip()
                 intent = response.get("intent", {}) or {}
 
-                # If this is a correlation-style question, override SQL to use the full dataset
                 primary_intent = intent.get("primary_intent", "").lower()
+
+                # If user clearly asked about correlation but LLM didn't label it, fix the intent
+                if is_correlation_query and primary_intent != "correlation":
+                    primary_intent = "correlation"
+                    intent["primary_intent"] = "correlation"
+
+                # If this is a correlation-style question, override SQL to use the full dataset
                 if primary_intent == "correlation" and table_names:
-                    # Use the first table from the schema and select all columns/rows.
-                    # Correlation logic will pick the numeric columns it needs.
                     base_table = table_names[0]
                     sql = f"SELECT * FROM {base_table}"
+
+                # If this is an overview/describe-dataset question, also use a simple full-table sample
+                if is_overview_query and table_names:
+                    base_table = table_names[0]
+                    # Limit for performance, but enough rows for good stats
+                    sql = f"SELECT * FROM {base_table} LIMIT 500"
+                    intent["primary_intent"] = intent.get("primary_intent") or "overview"
                 
                 if not sql:
                     raise ValueError("No SQL generated in response")
