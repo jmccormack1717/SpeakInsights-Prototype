@@ -15,7 +15,15 @@ export interface QueryResponse {
 }
 
 export interface VisualizationConfig {
-  type: 'bar' | 'line' | 'pie' | 'scatter' | 'histogram' | 'table' | 'horizontal_bar';
+  type:
+    | 'bar'
+    | 'line'
+    | 'pie'
+    | 'scatter'
+    | 'histogram'
+    | 'table'
+    | 'horizontal_bar'
+    | 'correlation_matrix';
   data: ChartData;
   config: {
     title?: string;
@@ -40,6 +48,7 @@ export interface ChartData {
   y?: number[];
   rows?: Record<string, any>[];
   columns?: string[];
+  matrix?: number[][];
 }
 
 export interface TextualAnalysis {

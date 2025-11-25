@@ -278,6 +278,9 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
 
     default:
       if (data?.columns && data?.rows) {
+        const columns = data.columns as string[];
+        const rows = data.rows as any[];
+
         return (
           <div className="w-full">
             {chartConfig.title && (
@@ -289,7 +292,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
               <table className="min-w-full divide-y divide-gray-200 text-sm">
                 <thead className="bg-gray-50">
                   <tr>
-                    {data.columns.map((col: string) => (
+                    {columns.map((col) => (
                       <th
                         key={col}
                         className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
@@ -300,14 +303,14 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {data.rows.slice(0, 50).map((row: any, idx: number) => (
+                  {rows.slice(0, 50).map((row, idx) => (
                     <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      {data.columns.map((col: string) => (
+                      {columns.map((col) => (
                         <td key={col} className="px-4 py-3 text-gray-900 whitespace-nowrap">
                           {row[col]?.toString() || ''}
                         </td>
                       ))}
-                  </tr>
+                    </tr>
                   ))}
                 </tbody>
               </table>
