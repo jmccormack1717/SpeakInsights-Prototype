@@ -25,22 +25,22 @@ export function DatasetSelector() {
   return (
     <div className="w-full">
       <div className="flex items-center gap-2 mb-3">
-        <Database className="w-5 h-5 text-indigo-600" />
-        <h2 className="text-lg font-semibold text-gray-800">Active Dataset</h2>
+        <Database className="w-5 h-5 text-si-primary" />
+        <h2 className="text-lg font-semibold text-si-text">Active dataset</h2>
       </div>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 p-5 hover:shadow-md transition-shadow">
+      <div className="bg-si-surface rounded-2xl shadow-si-soft/60 border border-si-border/70 p-5 hover:shadow-si-soft transition-shadow duration-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg flex items-center justify-center shadow-sm">
+            <div className="w-12 h-12 bg-gradient-to-br from-si-primary to-si-primary-strong rounded-2xl flex items-center justify-center shadow-md">
               <Database className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900 text-lg">{HARDCODED_DATASET.name}</h3>
-              <p className="text-sm text-gray-500 mt-0.5">Ready to query</p>
+              <h3 className="font-semibold text-si-text text-lg">{HARDCODED_DATASET.name}</h3>
+              <p className="text-sm text-si-muted mt-0.5">Ready to analyze and visualize</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-full border border-green-200">
+          <div className="flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 text-emerald-400 text-sm font-medium rounded-full border border-emerald-400/40">
             <CheckCircle2 className="w-4 h-4" />
             <span>Active</span>
           </div>

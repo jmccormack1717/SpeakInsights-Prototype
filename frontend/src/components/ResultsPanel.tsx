@@ -11,7 +11,7 @@ export function ResultsPanel() {
 
   if (error) {
     return (
-      <div className="w-full mt-6 p-5 bg-red-50 border-l-4 border-red-500 rounded-lg shadow-sm">
+      <div className="w-full mt-6 p-5 bg-red-500/10 border-l-4 border-red-500 rounded-xl shadow-sm">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0">
             <svg className="w-5 h-5 text-red-500 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -32,13 +32,13 @@ export function ResultsPanel() {
   if (!currentResponse) {
     return (
       <div className="w-full mt-8 text-center py-12">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-100 mb-4">
-          <svg className="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-si-primary-soft mb-4">
+          <svg className="w-8 h-8 text-si-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
           </svg>
         </div>
-        <p className="text-gray-500 text-lg">Ask a question to see insights</p>
-        <p className="text-gray-400 text-sm mt-2">We\'ll analyze your data and show a visual summary</p>
+        <p className="text-si-muted text-lg">Ask a question to see insights</p>
+        <p className="text-si-muted text-sm mt-2">We\'ll analyze your data and show a visual story</p>
       </div>
     );
   }
@@ -46,7 +46,7 @@ export function ResultsPanel() {
   return (
     <div className="w-full mt-6 space-y-5">
       {/* Visualization - Prominent */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 p-6 sm:p-8">
+      <div className="bg-si-elevated rounded-2xl shadow-si-soft border border-si-border/70 p-6 sm:p-8">
         <ChartRenderer config={currentResponse.visualization} />
       </div>
 
@@ -55,38 +55,38 @@ export function ResultsPanel() {
 
       {/* Raw Data Toggle */}
       {currentResponse.results.length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 overflow-hidden">
+        <div className="bg-si-surface rounded-2xl shadow-sm border border-si-border/70 overflow-hidden">
           <button
             onClick={() => setShowRawData(!showRawData)}
-            className="w-full px-5 py-4 flex items-center justify-between hover:bg-gray-50 transition-colors"
+            className="w-full px-5 py-4 flex items-center justify-between hover:bg-si-primary-soft/40 transition-colors"
           >
-            <span className="font-medium text-gray-700">
-              Raw Data <span className="text-gray-500 font-normal">({currentResponse.results.length} rows)</span>
+            <span className="font-medium text-si-text">
+              Raw data <span className="text-si-muted font-normal">({currentResponse.results.length} rows)</span>
             </span>
             {showRawData ? (
-              <ChevronUp className="w-5 h-5 text-gray-400" />
+              <ChevronUp className="w-5 h-5 text-si-muted" />
             ) : (
-              <ChevronDown className="w-5 h-5 text-gray-400" />
+              <ChevronDown className="w-5 h-5 text-si-muted" />
             )}
           </button>
           {showRawData && (
-            <div className="px-5 pb-5 border-t border-gray-100">
-              <div className="mt-4 overflow-x-auto rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200 text-sm">
-                  <thead className="bg-gray-50">
+            <div className="px-5 pb-5 border-t border-si-border/40">
+              <div className="mt-4 overflow-x-auto rounded-xl border border-si-border/60">
+                <table className="min-w-full divide-y divide-si-border/60 text-sm">
+                  <thead className="bg-si-surface/70">
                     <tr>
                       {Object.keys(currentResponse.results[0]).map((col) => (
-                        <th key={col} className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                        <th key={col} className="px-4 py-3 text-left text-xs font-semibold text-si-muted uppercase tracking-wider">
                           {col}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="bg-si-surface divide-y divide-si-border/40">
                     {currentResponse.results.slice(0, 50).map((row, idx) => (
-                      <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                      <tr key={idx} className="hover:bg-si-primary-soft/30 transition-colors">
                         {Object.keys(row).map((col) => (
-                          <td key={col} className="px-4 py-3 text-gray-900 whitespace-nowrap">
+                          <td key={col} className="px-4 py-3 text-si-text whitespace-nowrap">
                             {row[col]?.toString() || ''}
                           </td>
                         ))}
@@ -95,7 +95,7 @@ export function ResultsPanel() {
                   </tbody>
                 </table>
                 {currentResponse.results.length > 50 && (
-                  <div className="bg-gray-50 px-4 py-3 text-sm text-gray-500 text-center border-t border-gray-200">
+                  <div className="bg-si-surface/80 px-4 py-3 text-sm text-si-muted text-center border-t border-si-border/60">
                     Showing first 50 of {currentResponse.results.length} rows
                   </div>
                 )}

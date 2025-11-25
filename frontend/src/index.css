@@ -2,6 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design tokens backed by CSS variables so light/dark themes stay in sync */
+:root {
+  /* RGB values (no commas) so Tailwind can do rgb(var(--si-*) / <alpha-value>) */
+  --si-bg: 248 250 252;        /* slate-50 */
+  --si-surface: 255 255 255;   /* white */
+  --si-elevated: 255 255 255;
+  --si-border: 226 232 240;    /* slate-200 */
+  --si-text: 15 23 42;         /* slate-900 */
+  --si-muted: 100 116 139;     /* slate-500 */
+
+  color-scheme: light;
+}
+
+/* Dark mode overrides (toggle by adding/removing .dark on <html>) */
+html.dark {
+  --si-bg: 10 16 30;           /* deep navy background */
+  --si-surface: 15 23 42;      /* slate-900-ish surface */
+  --si-elevated: 15 23 42;
+  --si-border: 30 64 175;      /* brand blue border accent */
+  --si-text: 226 232 240;      /* slate-200 */
+  --si-muted: 148 163 184;     /* slate-400 */
+
+  color-scheme: dark;
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
@@ -9,7 +34,8 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #1f2937;
+  background-color: rgb(var(--si-bg));
+  color: rgb(var(--si-text));
 }
 
 code {
@@ -22,22 +48,22 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar tuned to the brand */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: rgba(148, 163, 184, 0.15);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
+  background: linear-gradient(180deg, #1D5FD6, #123769);
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: linear-gradient(180deg, #2563EB, #0F3A77);
 }
 

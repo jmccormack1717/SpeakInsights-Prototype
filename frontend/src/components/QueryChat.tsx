@@ -49,7 +49,7 @@ export function QueryChat() {
   return (
     <div className="w-full">
       <div className="mb-3">
-        <label className="text-sm font-medium text-gray-700">Ask about your data</label>
+        <label className="text-sm font-medium text-si-muted">Ask about your data</label>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
@@ -63,13 +63,13 @@ export function QueryChat() {
                 : "Please select a dataset first"
             }
             disabled={isLoading || !currentDatasetId}
-            className="w-full px-5 py-4 pr-12 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent disabled:bg-gray-50 disabled:cursor-not-allowed text-gray-900 placeholder:text-gray-400 shadow-sm transition-all"
+            className="w-full px-5 py-4 pr-12 bg-si-surface border border-si-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-si-primary focus:border-transparent disabled:bg-si-surface/60 disabled:cursor-not-allowed text-si-text placeholder:text-si-muted shadow-sm transition-all duration-200"
           />
         </div>
         <button
           type="submit"
           disabled={isLoading || !question.trim() || !currentDatasetId}
-          className="px-6 py-4 bg-gradient-to-r from-indigo-600 to-blue-600 text-white rounded-xl hover:from-indigo-700 hover:to-blue-700 disabled:from-gray-400 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transition-all min-w-[120px]"
+          className="px-6 py-4 bg-gradient-to-r from-si-primary to-si-primary-strong text-white rounded-2xl hover:from-si-primary-strong hover:to-si-primary disabled:from-slate-500 disabled:to-slate-600 disabled:cursor-not-allowed flex items-center justify-center gap-2 font-medium shadow-md hover:shadow-lg transition-all min-w-[120px]"
         >
           {isLoading ? (
             <>
