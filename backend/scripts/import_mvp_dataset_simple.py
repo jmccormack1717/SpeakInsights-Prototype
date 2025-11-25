@@ -165,8 +165,8 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print("Usage: python import_mvp_dataset_simple.py <path_to_csv> [table_name]")
         print("\nExample:")
-        print("  python import_mvp_dataset_simple.py ../diabetes.csv")
-        print("  python import_mvp_dataset_simple.py ../diabetes.csv diabetes_data")
+        print("  python import_mvp_dataset_simple.py ../cleaned_diabetes_dataset.csv")
+        print("  python import_mvp_dataset_simple.py ../cleaned_diabetes_dataset.csv diabetes_data")
         sys.exit(1)
     
     csv_path = sys.argv[1]

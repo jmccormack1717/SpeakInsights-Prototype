@@ -112,10 +112,11 @@ async def startup_event():
         
         # Look for CSV file in common locations (relative to backend directory)
         backend_dir = Path(__file__).parent.parent
+        # Prefer cleaned dataset for MVP
         csv_paths = [
-            backend_dir / "diabetes.csv",  # In backend directory
-            backend_dir.parent / "diabetes.csv",  # In project root
-            backend_dir / "data" / "diabetes.csv",  # In backend/data
+            backend_dir / "cleaned_diabetes_dataset.csv",  # In backend directory
+            backend_dir.parent / "cleaned_diabetes_dataset.csv",  # In project root
+            backend_dir / "data" / "cleaned_diabetes_dataset.csv",  # In backend/data
         ]
         
         csv_file = None
@@ -150,8 +151,9 @@ async def startup_event():
                 logger.exception(e)
         else:
             logger.warning(
-                f"CSV file not found. Please ensure 'diabetes.csv' is available. "
-                f"Database will be created when first query is made or CSV is uploaded."
+                "CSV file not found. Please ensure 'cleaned_diabetes_dataset.csv' is available "
+                "in the backend directory, project root, or backend/data. "
+                "Database will be created when first query is made or CSV is uploaded."
             )
     else:
         logger.info(f"MVP dataset found at {db_path}")
