@@ -1,5 +1,6 @@
 """Visualization service: Chart type selection and configuration"""
 from typing import Dict, Any, List
+import pandas as pd
 
 
 class VisualizationService:
@@ -22,8 +23,27 @@ class VisualizationService:
         """
         primary_intent = intent.get("primary_intent", "comparison")
         explicit_chart = intent.get("explicit_chart_type")
-        
-        # If user explicitly requested a chart type, use it
+
+        # Normalize and validate explicit chart type
+        allowed_chart_types = {
+            "bar",
+            "horizontal_bar",
+            "line",
+            "pie",
+            "scatter",
+            "histogram",
+            "correlation_matrix",
+            "table",
+        }
+
+        if isinstance(explicit_chart, str):
+            explicit_chart = explicit_chart.lower().strip()
+            if explicit_chart not in allowed_chart_types:
+                explicit_chart = None
+        else:
+            explicit_chart = None
+
+        # If user explicitly requested a supported chart type, use it
         if explicit_chart:
             return self._create_chart_config(
                 explicit_chart,
@@ -105,13 +125,9 @@ class VisualizationService:
             numeric_cols = data_structure.get("numeric_columns", [])
             if len(numeric_cols) >= 2:
                 return {
-                    "type": "scatter",
-                    "x_axis": numeric_cols[0],
-                    "y_axis": numeric_cols[1],
+                    "type": "correlation_matrix",
                     "config": {
-                        "title": f"{numeric_cols[1]} vs {numeric_cols[0]}",
-                        "xLabel": numeric_cols[0],
-                        "yLabel": numeric_cols[1]
+                        "title": "Feature Correlations"
                     }
                 }
         
@@ -218,7 +234,25 @@ class VisualizationService:
                 "values": values,
                 "bins": chart_config.get("config", {}).get("bins", 10)
             }
-        
+
+        elif chart_type == "correlation_matrix":
+            # Build correlation matrix from numeric columns in the results
+            df = pd.DataFrame(results)
+            if df.empty:
+                return {"labels": [], "matrix": []}
+
+            num_df = df.select_dtypes(include="number")
+            if num_df.shape[1] < 2:
+                return {"labels": list(num_df.columns), "matrix": []}
+
+            corr = num_df.corr().fillna(0.0)
+            labels = list(corr.columns)
+            matrix = corr.values.tolist()
+            return {
+                "labels": labels,
+                "matrix": matrix,
+            }
+
         else:  # table
             return {
                 "columns": list(results[0].keys()) if results else [],
@@ -256,6 +290,10 @@ class VisualizationService:
             if len(numeric_cols) >= 2:
                 config["x_axis"] = numeric_cols[0]
                 config["y_axis"] = numeric_cols[1]
+
+        elif chart_type == "correlation_matrix":
+            # Title for correlation matrix views
+            config["title"] = intent.get("title") or "Correlation Matrix"
         
         return config
     

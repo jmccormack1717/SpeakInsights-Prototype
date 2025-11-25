@@ -18,6 +18,17 @@ import type { VisualizationConfig } from '../types';
 
 const COLORS = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#06b6d4'];
 
+function correlationToColor(value: number): string {
+  if (isNaN(value)) return '#ffffff';
+  const norm = (value + 1) / 2; // [-1,1] -> [0,1]
+  const start = { r: 239, g: 246, b: 255 }; // light blue
+  const end = { r: 30, g: 64, b: 175 }; // deep blue
+  const r = Math.round(start.r + norm * (end.r - start.r));
+  const g = Math.round(start.g + norm * (end.g - start.g));
+  const b = Math.round(start.b + norm * (end.b - start.b));
+  return `rgb(${r}, ${g}, ${b})`;
+}
+
 export function ChartRenderer({ config }: { config: VisualizationConfig }) {
   const { type, data, config: chartConfig } = config;
 
@@ -173,6 +184,60 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
         </div>
       );
 
+    case 'correlation_matrix': {
+      const labels = data.labels || [];
+      const matrix = data.matrix || [];
+
+      return (
+        <div className="w-full">
+          {chartConfig.title && (
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+              {chartConfig.title}
+            </h3>
+          )}
+          <div className="overflow-x-auto rounded-lg border border-gray-200">
+            <table className="min-w-full border-collapse text-xs">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-2 py-2 text-[10px] font-semibold text-gray-500 text-left" />
+                  {labels.map((label: string) => (
+                    <th
+                      key={label}
+                      className="px-2 py-2 text-[10px] font-semibold text-gray-700 text-center"
+                    >
+                      {label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {matrix.map((row: number[], i: number) => (
+                  <tr key={labels[i] || i}>
+                    <th className="px-2 py-2 text-[10px] font-semibold text-gray-700 bg-gray-50 text-right">
+                      {labels[i] || i}
+                    </th>
+                    {row.map((val: number, j: number) => (
+                      <td
+                        key={`${i}-${j}`}
+                        className="px-1 py-1 text-[10px] text-center"
+                        style={{
+                          backgroundColor: correlationToColor(val),
+                          color: Math.abs(val) > 0.7 ? '#ffffff' : '#111827',
+                        }}
+                        title={`${labels[i] || i} vs ${labels[j] || j}: ${val.toFixed(2)}`}
+                      >
+                        {val.toFixed(2)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      );
+    }
+
     case 'table':
       return (
         <div className="w-full">
@@ -212,9 +277,50 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
       );
 
     default:
+      if (data?.columns && data?.rows) {
+        return (
+          <div className="w-full">
+            {chartConfig.title && (
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                {chartConfig.title}
+              </h3>
+            )}
+            <div className="overflow-x-auto rounded-lg border border-gray-200">
+              <table className="min-w-full divide-y divide-gray-200 text-sm">
+                <thead className="bg-gray-50">
+                  <tr>
+                    {data.columns.map((col: string) => (
+                      <th
+                        key={col}
+                        className="px-4 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+                      >
+                        {col}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {data.rows.slice(0, 50).map((row: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                      {data.columns.map((col: string) => (
+                        <td key={col} className="px-4 py-3 text-gray-900 whitespace-nowrap">
+                          {row[col]?.toString() || ''}
+                        </td>
+                      ))}
+                  </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        );
+      }
+
       return (
-        <div className="p-4 bg-yellow-50 border border-yellow-200 rounded">
-          <p>Unsupported chart type: {type}</p>
+        <div className="p-4 bg-blue-50 border border-blue-100 rounded">
+          <p className="text-sm text-blue-800">
+            We couldn&apos;t draw a chart for this answer, but the key insights are summarized below.
+          </p>
         </div>
       );
   }
