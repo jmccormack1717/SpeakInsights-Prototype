@@ -60,7 +60,20 @@ class DatabaseManager:
             
         Returns:
             List of result rows as dictionaries
+            
+        Raises:
+            FileNotFoundError: If database file doesn't exist
+            Exception: For other database errors
         """
+        db_path = self.get_database_path(user_id, dataset_id)
+        
+        # Check if database file exists
+        if not db_path.exists():
+            raise FileNotFoundError(
+                f"Database file not found: {db_path}. "
+                f"Please ensure the dataset '{dataset_id}' has been imported."
+            )
+        
         engine = await self.get_engine(user_id, dataset_id)
         
         async with engine.begin() as conn:
@@ -87,7 +100,20 @@ class DatabaseManager:
             
         Returns:
             Schema information as dict
+            
+        Raises:
+            FileNotFoundError: If database file doesn't exist
+            Exception: For other database errors
         """
+        db_path = self.get_database_path(user_id, dataset_id)
+        
+        # Check if database file exists
+        if not db_path.exists():
+            raise FileNotFoundError(
+                f"Database file not found: {db_path}. "
+                f"Please ensure the dataset '{dataset_id}' has been imported."
+            )
+        
         engine = await self.get_engine(user_id, dataset_id)
         
         schema_info = {

@@ -46,12 +46,25 @@ async def execute_query(request: QueryRequest):
     5. Select visualization
     6. Generate textual analysis
     """
+    import traceback
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
     try:
         # Step 1: Get schema
-        schema_info = await db_manager.get_schema(
-            request.user_id,
-            request.dataset_id
-        )
+        try:
+            schema_info = await db_manager.get_schema(
+                request.user_id,
+                request.dataset_id
+            )
+        except Exception as e:
+            logger.error(f"Failed to get schema: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise HTTPException(
+                status_code=404,
+                detail=f"Dataset '{request.dataset_id}' not found. Error: {str(e)}"
+            )
         
         if not schema_info.get("tables"):
             raise HTTPException(
@@ -60,46 +73,89 @@ async def execute_query(request: QueryRequest):
             )
         
         # Step 2: Generate SQL
-        sql_result = await query_service.generate_sql(
-            request.query,
-            schema_info
-        )
-        sql = sql_result["sql"]
-        intent = sql_result["intent"]
+        try:
+            sql_result = await query_service.generate_sql(
+                request.query,
+                schema_info
+            )
+            sql = sql_result["sql"]
+            intent = sql_result["intent"]
+        except Exception as e:
+            logger.error(f"Failed to generate SQL: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to generate SQL query: {str(e)}"
+            )
         
         # Step 3: Execute query
-        results = await db_manager.execute_query(
-            request.user_id,
-            request.dataset_id,
-            sql
-        )
+        try:
+            results = await db_manager.execute_query(
+                request.user_id,
+                request.dataset_id,
+                sql
+            )
+        except Exception as e:
+            logger.error(f"Failed to execute query: {str(e)}")
+            logger.error(traceback.format_exc())
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to execute SQL query: {str(e)}"
+            )
         
         # Step 4: Analyze data structure
-        data_structure = data_analysis_service.analyze_structure(results)
+        try:
+            data_structure = data_analysis_service.analyze_structure(results)
+        except Exception as e:
+            logger.error(f"Failed to analyze data structure: {str(e)}")
+            data_structure = {}
         
         # Step 5: Select visualization
-        chart_config = viz_service.select_chart_type(intent, data_structure)
-        formatted_data = viz_service.format_data_for_chart(results, chart_config)
-        
-        visualization = {
-            "type": chart_config.get("type"),
-            "data": formatted_data,
-            "config": chart_config.get("config", {}),
-            "metadata": {
-                "x_axis": chart_config.get("x_axis"),
-                "y_axis": chart_config.get("y_axis"),
-                "labels": chart_config.get("labels"),
-                "values": chart_config.get("values")
+        try:
+            chart_config = viz_service.select_chart_type(intent, data_structure)
+            formatted_data = viz_service.format_data_for_chart(results, chart_config)
+            
+            visualization = {
+                "type": chart_config.get("type"),
+                "data": formatted_data,
+                "config": chart_config.get("config", {}),
+                "metadata": {
+                    "x_axis": chart_config.get("x_axis"),
+                    "y_axis": chart_config.get("y_axis"),
+                    "labels": chart_config.get("labels"),
+                    "values": chart_config.get("values")
+                }
             }
-        }
+        except Exception as e:
+            logger.error(f"Failed to create visualization: {str(e)}")
+            # Fallback to table visualization
+            visualization = {
+                "type": "table",
+                "data": {
+                    "columns": list(results[0].keys()) if results else [],
+                    "rows": results[:100]
+                },
+                "config": {},
+                "metadata": {}
+            }
         
         # Step 6: Generate analysis
-        textual_analysis = await analysis_service.generate_insights(
-            request.query,
-            results,
-            sql,
-            data_structure
-        )
+        try:
+            textual_analysis = await analysis_service.generate_insights(
+                request.query,
+                results,
+                sql,
+                data_structure
+            )
+        except Exception as e:
+            logger.error(f"Failed to generate analysis: {str(e)}")
+            # Fallback analysis
+            textual_analysis = {
+                "summary": f"Query returned {len(results)} rows.",
+                "key_findings": [],
+                "patterns": [],
+                "recommendations": []
+            }
         
         return QueryResponse(
             sql=sql,
@@ -109,8 +165,15 @@ async def execute_query(request: QueryRequest):
             data_structure=data_structure
         )
     
+    except HTTPException:
+        raise
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Query execution failed: {str(e)}")
+        logger.error(f"Unexpected error in query execution: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Query execution failed: {str(e)}"
+        )
 
