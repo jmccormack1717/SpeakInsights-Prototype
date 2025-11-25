@@ -99,6 +99,8 @@ async def execute_query(request: QueryRequest):
 
         playbook_name = analysis_request.get("playbook", "overview")
         target = analysis_request.get("target")
+        feature = analysis_request.get("feature")
+        segment_column = analysis_request.get("segment_column")
         mode = analysis_request.get("mode", "quick")
 
         # Step 3: Execute fixed SQL (no LLM-generated SQL)
@@ -135,6 +137,17 @@ async def execute_query(request: QueryRequest):
         if playbook_name == "correlation":
             outcome_col = target or "Outcome"
             play = playbooks.correlation_playbook(df, outcome=outcome_col)
+        elif playbook_name == "distribution":
+            feature_col = feature
+            # Fallbacks are handled inside the playbook if feature_col is None or invalid
+            play = playbooks.distribution_playbook(df, feature=feature_col)
+        elif playbook_name == "segment_comparison":
+            seg_col = segment_column
+            # Outcome is optional; playbook will fall back to row counts if not usable
+            play = playbooks.segment_comparison_playbook(df, segment_column=seg_col, outcome=target)
+        elif playbook_name == "outcome_breakdown":
+            outcome_col = target or "Outcome"
+            play = playbooks.outcome_breakdown_playbook(df, outcome=outcome_col)
         else:  # default to overview
             play = playbooks.overview_playbook(df)
 

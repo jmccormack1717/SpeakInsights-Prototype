@@ -40,11 +40,12 @@ function App() {
       <header className="bg-si-surface/70 backdrop-blur-xl border-b border-si-border/60 shadow-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="relative w-11 h-11 rounded-2xl bg-gradient-to-br from-si-primary to-si-primary-strong shadow-si-soft flex items-center justify-center overflow-hidden">
-              <div className="absolute inset-[18%] rounded-lg bg-white/10" />
-              <span className="relative text-white font-bold text-xl tracking-tight">
-                SI
-              </span>
+            <div className="relative w-11 h-11 rounded-2xl bg-si-surface shadow-si-soft flex items-center justify-center overflow-hidden border border-si-border/70">
+              <img
+                src="/logo.jpg"
+                alt="Speak Insights logo"
+                className="w-full h-full object-contain"
+              />
             </div>
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">

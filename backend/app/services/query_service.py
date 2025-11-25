@@ -30,6 +30,9 @@ class QueryService:
 Available playbooks:
 - "overview": High-level description of the dataset (size, key numeric features, ranges, missingness).
 - "correlation": Identify numeric features most strongly related to a target column.
+- "distribution": Explore the distribution and outliers for a single numeric feature.
+- "segment_comparison": Compare two cohorts (e.g. outcome=1 vs outcome=0) on a key metric.
+- "outcome_breakdown": Show how often each outcome/target class occurs (class balance).
 """
 
         prompt = f"""You are an analysis planner. Your job is to choose ONE analysis playbook
@@ -44,17 +47,22 @@ User question: "{user_query}"
 
 Return a JSON object ONLY, with this structure:
 {{
-  "playbook": "overview" | "correlation",
-  "target": "column_name or null",
+  "playbook": "overview" | "correlation" | "distribution" | "segment_comparison" | "outcome_breakdown",
+  "target": "column_name or null",              // for correlation & outcome_breakdown
+  "feature": "column_name or null",             // for distribution (numeric)
+  "segment_column": "column_name or null",      // for segment_comparison (categorical/boolean)
   "mode": "quick" | "deep"
 }}
 
 Rules:
 - Use "overview" when the user asks to describe or summarize the dataset or data overall.
 - Use "correlation" when the user asks which features/columns are most related to an outcome or target.
+- Use "distribution" when the user asks about the spread, range, outliers, or histogram of a single numeric column.
+- Use "segment_comparison" when the user asks to compare two groups or cohorts (e.g. outcome=1 vs outcome=0, men vs women).
+- Use "outcome_breakdown" when the user asks how often the outcome/target occurs, or for class balance / base rate.
 - For "correlation", choose a numeric column that looks like the outcome/target (e.g., a binary label) if possible.
-- If you are unsure of the target for "correlation", set "target" to null.
 - Default mode is "quick" unless the user clearly asks for very detailed or deep analysis.
+- If you are unsure of a column to use for a given playbook, set its field to null and let the backend fall back safely.
 """
 
         messages = [
@@ -81,15 +89,24 @@ Rules:
 
         playbook = response.get("playbook", "overview")
         target = response.get("target")
+        feature = response.get("feature")
+        segment_column = response.get("segment_column")
         mode = response.get("mode", "quick")
 
         # Basic validation and fallbacks
-        if playbook not in {"overview", "correlation"}:
+        allowed_playbooks = {
+            "overview",
+            "correlation",
+            "distribution",
+            "segment_comparison",
+            "outcome_breakdown",
+        }
+        if playbook not in allowed_playbooks:
             playbook = "overview"
 
-        # Heuristic: if correlation was requested but target is missing,
+        # Heuristic: if correlation or outcome_breakdown was requested but target is missing,
         # try to infer a reasonable default from schema table names / columns.
-        if playbook == "correlation" and not target:
+        if playbook in {"correlation", "outcome_breakdown"} and not target:
             candidate_names = {"outcome", "target", "label", "y"}
             for table in schema_info.get("tables", []):
                 for col in table.get("columns", []):
@@ -103,6 +120,8 @@ Rules:
         return {
             "playbook": playbook,
             "target": target,
+            "feature": feature,
+            "segment_column": segment_column,
             "mode": mode,
         }
 
