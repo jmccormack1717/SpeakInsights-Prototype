@@ -148,6 +148,14 @@ async def execute_query(request: QueryRequest):
         elif playbook_name == "outcome_breakdown":
             outcome_col = target or "Outcome"
             play = playbooks.outcome_breakdown_playbook(df, outcome=outcome_col)
+        elif playbook_name == "feature_outcome_profile":
+            feature_col = feature
+            outcome_col = target or "Outcome"
+            play = playbooks.feature_outcome_profile_playbook(
+                df,
+                feature=feature_col,
+                outcome=outcome_col,
+            )
         else:  # default to overview
             play = playbooks.overview_playbook(df)
 

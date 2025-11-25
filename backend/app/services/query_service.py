@@ -33,6 +33,7 @@ Available playbooks:
 - "distribution": Explore the distribution and outliers for a single numeric feature.
 - "segment_comparison": Compare two cohorts (e.g. outcome=1 vs outcome=0) on a key metric.
 - "outcome_breakdown": Show how often each outcome/target class occurs (class balance).
+- "feature_outcome_profile": Show how outcome rate changes across the range of a numeric feature.
 """
 
         prompt = f"""You are an analysis planner. Your job is to choose ONE analysis playbook
@@ -47,9 +48,9 @@ User question: "{user_query}"
 
 Return a JSON object ONLY, with this structure:
 {{
-  "playbook": "overview" | "correlation" | "distribution" | "segment_comparison" | "outcome_breakdown",
-  "target": "column_name or null",              // for correlation & outcome_breakdown
-  "feature": "column_name or null",             // for distribution (numeric)
+  "playbook": "overview" | "correlation" | "distribution" | "segment_comparison" | "outcome_breakdown" | "feature_outcome_profile",
+  "target": "column_name or null",              // for correlation, outcome_breakdown & feature_outcome_profile
+  "feature": "column_name or null",             // for distribution & feature_outcome_profile (numeric)
   "segment_column": "column_name or null",      // for segment_comparison (categorical/boolean)
   "mode": "quick" | "deep"
 }}
@@ -60,6 +61,7 @@ Rules:
 - Use "distribution" when the user asks about the spread, range, outliers, or histogram of a single numeric column.
 - Use "segment_comparison" when the user asks to compare two groups or cohorts (e.g. outcome=1 vs outcome=0, men vs women).
 - Use "outcome_breakdown" when the user asks how often the outcome/target occurs, or for class balance / base rate.
+- Use "feature_outcome_profile" when the user asks how the outcome changes as a feature increases/decreases (e.g. outcome vs glucose levels).
 - For "correlation", choose a numeric column that looks like the outcome/target (e.g., a binary label) if possible.
 - Default mode is "quick" unless the user clearly asks for very detailed or deep analysis.
 - If you are unsure of a column to use for a given playbook, set its field to null and let the backend fall back safely.
@@ -100,6 +102,7 @@ Rules:
             "distribution",
             "segment_comparison",
             "outcome_breakdown",
+            "feature_outcome_profile",
         }
         if playbook not in allowed_playbooks:
             playbook = "overview"

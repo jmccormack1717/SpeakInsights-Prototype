@@ -386,3 +386,135 @@ def segment_comparison_playbook(
     }
 
 
+def feature_outcome_profile_playbook(
+    df: pd.DataFrame,
+    feature: Optional[str] = None,
+    outcome: Optional[str] = None,
+    bins: int = 8,
+) -> Dict[str, Any]:
+    """
+    Profile how outcome rate changes across the range of a numeric feature.
+
+    - Bin the feature into quantiles.
+    - Compute average outcome in each bin.
+    - Return a line chart of outcome rate by feature bin.
+    """
+    num_df = df.select_dtypes(include="number")
+    if num_df.empty:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [], "rows": []},
+                "config": {"title": "No numeric columns available for feature profile"},
+            },
+            "analysis_context": {"kind": "feature_outcome_profile", "reason": "no_numeric_columns"},
+        }
+
+    # Infer feature if needed
+    if not feature or feature not in num_df.columns:
+        preferred = {"age", "glucose", "bmi", "insulin"}
+        pick = None
+        for col in num_df.columns:
+            if col.lower() in preferred:
+                pick = col
+                break
+        feature = pick or num_df.columns[0]
+
+    # Infer outcome if needed
+    if not outcome or outcome not in df.columns:
+        candidate_names = {"outcome", "target", "label", "y"}
+        for col in df.columns:
+            if col.lower() in candidate_names:
+                outcome = col
+                break
+
+    if not outcome or outcome not in df.columns or not pd.api.types.is_numeric_dtype(df[outcome]):
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [feature], "rows": []},
+                "config": {"title": f"Cannot profile {feature}: no numeric outcome found"},
+            },
+            "analysis_context": {
+                "kind": "feature_outcome_profile",
+                "feature": feature,
+                "reason": "no_numeric_outcome",
+            },
+        }
+
+    feature_series = pd.to_numeric(df[feature], errors="coerce")
+    outcome_series = pd.to_numeric(df[outcome], errors="coerce")
+    mask = feature_series.notna() & outcome_series.notna()
+    feature_series = feature_series[mask]
+    outcome_series = outcome_series[mask]
+
+    if feature_series.empty or outcome_series.empty:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [feature], "rows": []},
+                "config": {"title": f"No valid data to profile {feature} against {outcome}"},
+            },
+            "analysis_context": {
+                "kind": "feature_outcome_profile",
+                "feature": feature,
+                "outcome": outcome,
+                "reason": "no_valid_values",
+            },
+        }
+
+    try:
+        quantiles = pd.qcut(feature_series, q=bins, duplicates="drop")
+    except ValueError:
+        # Not enough unique values for quantile bins
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [feature], "rows": []},
+                "config": {"title": f"Not enough variation in {feature} to build a profile"},
+            },
+            "analysis_context": {
+                "kind": "feature_outcome_profile",
+                "feature": feature,
+                "outcome": outcome,
+                "reason": "low_variation",
+            },
+        }
+
+    grouped = outcome_series.groupby(quantiles).mean()
+    labels: List[str] = []
+    values: List[float] = []
+    for interval, mean_val in grouped.items():
+        if pd.isna(mean_val):
+            continue
+        left = round(float(interval.left), 2)
+        right = round(float(interval.right), 2)
+        labels.append(f"{left}–{right}")
+        values.append(round(float(mean_val), 3))
+
+    visualization = {
+        "type": "line",
+        "data": {
+            "x": labels,
+            "y": values,
+        },
+        "config": {
+            "title": f"Outcome rate by {feature} range",
+            "xLabel": f"{feature} range",
+            "yLabel": f"Average {outcome}",
+        },
+    }
+
+    analysis_context = {
+        "kind": "feature_outcome_profile",
+        "feature": feature,
+        "outcome": outcome,
+        "bins": labels,
+        "values": values,
+    }
+
+    return {
+        "visualization": visualization,
+        "analysis_context": analysis_context,
+    }
+
