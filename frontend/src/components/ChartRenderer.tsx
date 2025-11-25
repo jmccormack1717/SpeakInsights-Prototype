@@ -41,25 +41,24 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
       return (
         <div className="w-full">
           {chartConfig.title && (
-            <h3 className="text-lg font-semibold text-gray-800 mb-6">{chartConfig.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{chartConfig.title}</h3>
           )}
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={chartData} layout={type === 'horizontal_bar' ? 'vertical' : 'horizontal'} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
                 <XAxis 
-                  dataKey={type === 'horizontal_bar' ? 'value' : 'name'} 
-                  label={{ value: chartConfig.xLabel, position: 'insideBottom', offset: -5 }}
+                  dataKey={type === 'horizontal_bar' ? 'value' : 'name'}
                   stroke="#6b7280"
                   tick={{ fill: '#6b7280' }}
                 />
                 <YAxis 
                   dataKey={type === 'horizontal_bar' ? 'name' : 'value'}
-                  label={{ value: chartConfig.yLabel, angle: -90, position: 'insideLeft' }}
                   stroke="#6b7280"
                   tick={{ fill: '#6b7280' }}
                 />
                 <Tooltip 
+                  cursor={false}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',
@@ -79,24 +78,23 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
       return (
         <div className="w-full">
           {chartConfig.title && (
-            <h3 className="text-lg font-semibold text-gray-800 mb-6">{chartConfig.title}</h3>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">{chartConfig.title}</h3>
           )}
           <div className="h-96">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
                 <XAxis 
-                  dataKey="x" 
-                  label={{ value: chartConfig.xLabel, position: 'insideBottom', offset: -5 }}
+                  dataKey="x"
                   stroke="#6b7280"
                   tick={{ fill: '#6b7280' }}
                 />
                 <YAxis 
-                  label={{ value: chartConfig.yLabel, angle: -90, position: 'insideLeft' }}
                   stroke="#6b7280"
                   tick={{ fill: '#6b7280' }}
                 />
                 <Tooltip 
+                  cursor={false}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',
@@ -143,6 +141,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
                   ))}
                 </Pie>
                 <Tooltip 
+                  cursor={false}
                   contentStyle={{ 
                     backgroundColor: 'white', 
                     border: '1px solid #e5e7eb',
@@ -164,13 +163,11 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
             <LineChart data={chartData}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
-                dataKey="x" 
-                label={{ value: chartConfig.xLabel, position: 'insideBottom', offset: -5 }}
+                dataKey="x"
               />
               <YAxis 
-                label={{ value: chartConfig.yLabel, angle: -90, position: 'insideLeft' }}
               />
-              <Tooltip />
+              <Tooltip cursor={false} />
               <Legend />
               <Line 
                 type="monotone" 
