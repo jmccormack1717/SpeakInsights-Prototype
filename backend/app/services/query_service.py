@@ -41,7 +41,8 @@ Rules:
 2. Use proper SQL syntax for SQLite
 3. Include appropriate WHERE, GROUP BY, ORDER BY clauses when needed
 4. Use aggregate functions (SUM, COUNT, AVG, MAX, MIN) when appropriate
-5. Return valid JSON with the following structure:
+5. **CRITICAL: Generate ONLY ONE SELECT statement. Do not include multiple statements separated by semicolons.**
+6. Return valid JSON with the following structure:
    {{
      "sql": "SELECT ...",
      "intent": {{

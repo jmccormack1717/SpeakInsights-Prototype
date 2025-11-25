@@ -82,5 +82,8 @@ class SQLValidator:
         # Normalize whitespace
         sql = ' '.join(sql.split())
         
+        # Remove trailing semicolons
+        sql = sql.rstrip(';')
+        
         return sql.strip()
 

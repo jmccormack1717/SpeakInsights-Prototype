@@ -74,6 +74,15 @@ class DatabaseManager:
                 f"Please ensure the dataset '{dataset_id}' has been imported."
             )
         
+        # Extract only the first statement if multiple are present
+        # Split by semicolon and take the first non-empty statement
+        statements = [s.strip() for s in sql.split(';') if s.strip()]
+        if not statements:
+            raise ValueError("No valid SQL statement found")
+        
+        # Use only the first statement
+        sql = statements[0]
+        
         engine = await self.get_engine(user_id, dataset_id)
         
         async with engine.begin() as conn:
