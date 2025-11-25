@@ -42,7 +42,7 @@ function App() {
           <div className="flex items-center gap-3">
             <div className="relative w-11 h-11 rounded-2xl bg-si-surface shadow-si-soft flex items-center justify-center overflow-hidden border border-si-border/70">
               <img
-                src="/icon_nowords.png"
+                src="/icon.svg"
                 alt="Speak Insights icon"
                 className="w-9 h-9 object-contain"
               />

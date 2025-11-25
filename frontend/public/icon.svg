@@ -1,0 +1,21 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Speak Insights Icon</title>
+  <desc id="desc">Chat bubble with three ascending bars inside</desc>
+  <defs>
+    <linearGradient id="bubbleGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1D5FD6" />
+      <stop offset="100%" stop-color="#1A4FB0" />
+    </linearGradient>
+  </defs>
+  <!-- Chat bubble -->
+  <path
+    d="M128 64c-35.3 0-64 28.7-64 64v144c0 35.3 28.7 64 64 64h90.7L224 448l73.3-112H384c35.3 0 64-28.7 64-64V128c0-35.3-28.7-64-64-64H128z"
+    fill="url(#bubbleGradient)"
+  />
+  <!-- Bars -->
+  <rect x="176" y="208" width="48" height="120" rx="8" fill="#FFFFFF" />
+  <rect x="248" y="176" width="48" height="152" rx="8" fill="#FFFFFF" />
+  <rect x="320" y="144" width="48" height="184" rx="8" fill="#FFFFFF" />
+</svg>
+
+
