@@ -1,6 +1,6 @@
 /** Main application component */
 import { useEffect, useState } from 'react';
-import { Moon, Sun, PlayCircle } from 'lucide-react';
+import { Moon, Sun } from 'lucide-react';
 import { ResultsPanel } from './components/ResultsPanel';
 import { DatasetSelector } from './components/DatasetSelector';
 import { PlaybookExamples } from './components/PlaybookExamples';

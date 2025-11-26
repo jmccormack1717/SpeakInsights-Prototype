@@ -1,6 +1,6 @@
 /** Authentication card for the launch page: login / signup + optional demo CTA. */
 import { useState } from 'react';
-import { Lock, LogIn, UserPlus, Mail, PlayCircle } from 'lucide-react';
+import { Lock, Mail, PlayCircle } from 'lucide-react';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryStore } from '../stores/queryStore';
