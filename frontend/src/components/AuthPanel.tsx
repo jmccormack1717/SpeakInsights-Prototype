@@ -100,7 +100,6 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
             </span>
           )}
         </button>
-        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
