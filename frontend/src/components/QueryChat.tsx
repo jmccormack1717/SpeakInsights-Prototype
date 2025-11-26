@@ -74,8 +74,8 @@ export function QueryChat() {
             onChange={(e) => setQuestion(e.target.value)}
             placeholder={
               currentDatasetId
-                ? "e.g., What's the average glucose level? Show me the distribution of outcomes..."
-                : "Please select a dataset first"
+                ? 'Ask a question about your data...'
+                : 'Please select a dataset first'
             }
             disabled={isLoading || !currentDatasetId}
             className="w-full px-5 py-4 pr-12 bg-si-surface border border-si-border rounded-2xl focus:outline-none focus:ring-2 focus:ring-si-primary focus:border-transparent disabled:bg-si-surface/60 disabled:cursor-not-allowed text-si-text placeholder:text-si-muted shadow-sm transition-all duration-200"

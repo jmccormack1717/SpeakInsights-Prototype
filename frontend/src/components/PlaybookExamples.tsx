@@ -10,28 +10,28 @@ const EXAMPLES: { title: string; prompt: string; hint: string }[] = [
   },
   {
     title: 'Drivers of outcome',
-    prompt: 'Which features are most strongly related to the outcome?',
-    hint: 'Top drivers bar chart + risk curve for the strongest feature.',
+    prompt: 'Which features are most strongly related to the main outcome or target in this dataset?',
+    hint: 'Top drivers bar chart plus a focused risk curve for the strongest feature (if an outcome column exists).',
   },
   {
     title: 'Single feature distribution',
-    prompt: 'Show me the distribution of glucose.',
-    hint: 'Histogram + summary stats for one column.',
+    prompt: 'Show me the distribution of an important numeric feature in this dataset.',
+    hint: 'Histogram and summary stats for one numeric column (you can replace this with a specific feature name).',
   },
   {
     title: 'Relationship between two features',
-    prompt: 'How are BMI and glucose related?',
-    hint: 'Scatter plot + correlation.',
+    prompt: 'How are two key numeric features in this dataset related?',
+    hint: 'Scatter plot and correlation (e.g., Feature A vs Feature B).',
   },
   {
     title: 'Compare groups',
-    prompt: 'Compare patients with diabetes vs without across key metrics.',
-    hint: 'Group comparison with effect size.',
+    prompt: 'Compare two important groups in this dataset across key metrics.',
+    hint: 'Group comparison with effect size (e.g., Group A vs Group B).',
   },
   {
     title: 'Outcome breakdown',
-    prompt: 'What percentage of patients have the disease?',
-    hint: 'Class balance chart.',
+    prompt: 'How is the main outcome or target column distributed across the dataset?',
+    hint: 'Outcome / class balance chart.',
   },
 ];
 
