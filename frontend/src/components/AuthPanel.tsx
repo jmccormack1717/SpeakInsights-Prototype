@@ -66,17 +66,17 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   };
 
   return (
-    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-sm p-5 sm:p-7">
+    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-md p-6 sm:p-8">
       <div className="flex items-center justify-between gap-4 mb-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-si-primary-soft flex items-center justify-center">
             <Lock className="w-4.5 h-4.5 text-si-primary" />
           </div>
           <div>
-            <h2 className="text-base sm:text-lg font-semibold text-si-text">
+            <h2 className="text-lg sm:text-xl font-semibold text-si-text">
               {mode === 'login' ? 'Sign in to personalize datasets' : 'Create an account'}
             </h2>
-            <p className="text-xs sm:text-sm text-si-muted">
+            <p className="text-sm text-si-muted">
               Use your own user space while keeping the demo-friendly PIMA dataset.
             </p>
           </div>

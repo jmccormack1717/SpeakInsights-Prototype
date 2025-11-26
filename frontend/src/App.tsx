@@ -118,7 +118,7 @@ function App() {
       <div className="min-h-screen bg-si-bg text-si-text transition-colors duration-300 flex flex-col">
         {header}
         {/* Landing hero with plenty of whitespace, but larger, more readable center content */}
-        <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] items-stretch">
+        <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)] items-stretch">
           <section className="space-y-7 flex flex-col justify-center">
             <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-si-text">
               Ask questions about your data,
@@ -145,7 +145,7 @@ function App() {
           </section>
 
           <section className="space-y-4 flex flex-col justify-center">
-            <div className="max-w-lg w-full mx-auto">
+            <div className="max-w-2xl w-full mx-auto">
               <AuthPanel onAuthenticated={handleStartDemo} />
             </div>
           </section>
