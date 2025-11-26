@@ -528,3 +528,218 @@ def feature_outcome_profile_playbook(
         "analysis_context": analysis_context,
     }
 
+
+def relationship_playbook(
+    df: pd.DataFrame,
+    feature_x: Optional[str] = None,
+    feature_y: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Show the relationship between two numeric features using a scatter plot.
+    """
+    num_df = df.select_dtypes(include="number")
+    if num_df.shape[1] < 2:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": num_df.columns.tolist(), "rows": []},
+                "config": {"title": "Not enough numeric columns to show a relationship"},
+            },
+            "analysis_context": {"kind": "relationship", "reason": "insufficient_numeric_columns"},
+        }
+
+    # Fallback inference if features are not provided or invalid
+    candidates = list(num_df.columns)
+    if not feature_x or feature_x not in candidates:
+        feature_x = candidates[0]
+    if not feature_y or feature_y not in candidates or feature_y == feature_x:
+        feature_y = candidates[1] if len(candidates) > 1 else candidates[0]
+
+    x_series = pd.to_numeric(df[feature_x], errors="coerce")
+    y_series = pd.to_numeric(df[feature_y], errors="coerce")
+    mask = x_series.notna() & y_series.notna()
+    x_values = x_series[mask].tolist()
+    y_values = y_series[mask].tolist()
+
+    if len(x_values) < 5:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [feature_x, feature_y], "rows": []},
+                "config": {"title": "Not enough valid data points to show a relationship"},
+            },
+            "analysis_context": {
+                "kind": "relationship",
+                "feature_x": feature_x,
+                "feature_y": feature_y,
+                "reason": "too_few_points",
+            },
+        }
+
+    # Simple Pearson correlation as a numeric summary
+    try:
+        corr = float(pd.Series(x_values).corr(pd.Series(y_values)))
+    except Exception:
+        corr = None
+
+    visualization = {
+        "type": "scatter",
+        "data": {
+            "x": x_values,
+            "y": y_values,
+        },
+        "config": {
+            "title": f"{feature_y} vs {feature_x}",
+            "xLabel": feature_x,
+            "yLabel": feature_y,
+            "mark": "point",
+            "xField": feature_x,
+            "yField": feature_y,
+        },
+    }
+
+    analysis_context = {
+        "kind": "relationship",
+        "feature_x": feature_x,
+        "feature_y": feature_y,
+        "correlation": round(corr, 3) if corr is not None else None,
+        "point_count": len(x_values),
+    }
+
+    return {
+        "visualization": visualization,
+        "analysis_context": analysis_context,
+    }
+
+
+def segmented_distribution_playbook(
+    df: pd.DataFrame,
+    feature: Optional[str] = None,
+    segment_column: Optional[str] = None,
+) -> Dict[str, Any]:
+    """
+    Show how the distribution/average of a numeric feature differs across segments.
+
+    For now this returns a bar chart of the mean feature value per segment, and
+    includes basic distribution summaries in the analysis context.
+    """
+    if df.empty:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [], "rows": []},
+                "config": {"title": "No data available for segmented distribution"},
+            },
+            "analysis_context": {"kind": "segmented_distribution", "reason": "empty_dataframe"},
+        }
+
+    num_df = df.select_dtypes(include="number")
+    if num_df.empty:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [], "rows": []},
+                "config": {"title": "No numeric columns available for segmented distribution"},
+            },
+            "analysis_context": {"kind": "segmented_distribution", "reason": "no_numeric_columns"},
+        }
+
+    # Infer feature if needed
+    if not feature or feature not in num_df.columns:
+        preferred = {"age", "glucose", "bmi", "insulin"}
+        pick = None
+        for col in num_df.columns:
+            if col.lower() in preferred:
+                pick = col
+                break
+        feature = pick or num_df.columns[0]
+
+    # Infer segment column if needed
+    if segment_column is None or segment_column not in df.columns:
+        for col in df.columns:
+            unique_vals = df[col].nunique(dropna=True)
+            if 2 <= unique_vals <= 6:
+                segment_column = col
+                break
+
+    if segment_column is None or segment_column not in df.columns:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [], "rows": []},
+                "config": {"title": "No suitable segment column found for segmented distribution"},
+            },
+            "analysis_context": {
+                "kind": "segmented_distribution",
+                "feature": feature,
+                "reason": "no_segment_column",
+            },
+        }
+
+    grouped = df.groupby(segment_column)[feature]
+    means = grouped.mean().dropna()
+    if means.empty:
+        return {
+            "visualization": {
+                "type": "table",
+                "data": {"columns": [segment_column, feature], "rows": []},
+                "config": {"title": f"No valid {feature} values for segmented distribution"},
+            },
+            "analysis_context": {
+                "kind": "segmented_distribution",
+                "feature": feature,
+                "segment_column": segment_column,
+                "reason": "no_valid_values",
+            },
+        }
+
+    labels = [str(idx) for idx in means.index.tolist()]
+    values = [round(float(v), 2) for v in means.values.tolist()]
+
+    visualization = {
+        "type": "bar",
+        "data": {
+            "labels": labels,
+            "values": values,
+        },
+        "config": {
+            "title": f"Average {feature} by {segment_column}",
+            "xLabel": segment_column,
+            "yLabel": f"Average {feature}",
+            "mark": "bar",
+            "xField": segment_column,
+            "yField": f"avg_{feature}",
+        },
+    }
+
+    # Basic per-segment summary stats
+    summaries: List[Dict[str, Any]] = []
+    for seg, series in grouped:
+        s = pd.to_numeric(series, errors="coerce").dropna()
+        if s.empty:
+            continue
+        summaries.append(
+            {
+                "segment": str(seg),
+                "count": int(s.shape[0]),
+                "mean": round(float(s.mean()), 2),
+                "median": round(float(s.median()), 2),
+                "min": round(float(s.min()), 2),
+                "max": round(float(s.max()), 2),
+            }
+        )
+
+    analysis_context = {
+        "kind": "segmented_distribution",
+        "feature": feature,
+        "segment_column": segment_column,
+        "segments": labels,
+        "segment_means": dict(zip(labels, values)),
+        "segment_summaries": summaries,
+    }
+
+    return {
+        "visualization": visualization,
+        "analysis_context": analysis_context,
+    }
+

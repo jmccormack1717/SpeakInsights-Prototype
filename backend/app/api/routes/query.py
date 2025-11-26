@@ -102,6 +102,8 @@ async def execute_query(request: QueryRequest):
         target = analysis_request.get("target")
         feature = analysis_request.get("feature")
         segment_column = analysis_request.get("segment_column")
+        feature_x = analysis_request.get("feature_x")
+        feature_y = analysis_request.get("feature_y")
         top_n = analysis_request.get("top_n")
         bins = analysis_request.get("bins")
         filter_segment = analysis_request.get("filter_segment")
@@ -179,6 +181,12 @@ async def execute_query(request: QueryRequest):
                 feature=feature_col,
                 bins=bins or 10,
             )
+        elif playbook_name == "segmented_distribution":
+            play = playbooks.segmented_distribution_playbook(
+                df,
+                feature=feature,
+                segment_column=segment_column,
+            )
         elif playbook_name == "segment_comparison":
             seg_col = segment_column
             # Outcome is optional; playbook will fall back to row counts if not usable
@@ -194,6 +202,12 @@ async def execute_query(request: QueryRequest):
                 feature=feature_col,
                 outcome=outcome_col,
                 bins=bins or 8,
+            )
+        elif playbook_name == "relationship":
+            play = playbooks.relationship_playbook(
+                df,
+                feature_x=feature_x,
+                feature_y=feature_y,
             )
         else:  # default to overview
             play = playbooks.overview_playbook(df)
@@ -235,6 +249,18 @@ async def execute_query(request: QueryRequest):
                         feature=feature,
                         outcome=outcome_col,
                         bins=bins or 8,
+                    )
+                elif secondary == "relationship":
+                    secondary_play = playbooks.relationship_playbook(
+                        df,
+                        feature_x=feature_x,
+                        feature_y=feature_y,
+                    )
+                elif secondary == "segmented_distribution":
+                    secondary_play = playbooks.segmented_distribution_playbook(
+                        df,
+                        feature=feature,
+                        segment_column=segment_column,
                     )
                 else:
                     continue

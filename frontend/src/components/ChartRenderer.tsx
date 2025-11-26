@@ -13,6 +13,8 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ScatterChart,
+  Scatter,
 } from 'recharts';
 import type { VisualizationConfig } from '../types';
 
@@ -200,27 +202,40 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
 
     case 'scatter':
       return (
-        <div className="w-full h-96">
-          <h3 className="text-xl font-semibold mb-4">{chartConfig.title || 'Chart'}</h3>
-          <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="x"
-              />
-              <YAxis 
-              />
-              <Tooltip cursor={false} wrapperStyle={{ zIndex: 50 }} />
-              <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="y" 
-                stroke={COLORS[0]} 
-                strokeWidth={2}
-                dot={{ r: 4 }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="w-full">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">
+            {chartConfig.title || 'Relationship'}
+          </h3>
+          <div className="h-96">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" opacity={0.3} />
+                <XAxis
+                  dataKey="x"
+                  name={chartConfig.xLabel}
+                  stroke="#6b7280"
+                  tick={{ fill: '#6b7280' }}
+                />
+                <YAxis
+                  dataKey="y"
+                  name={chartConfig.yLabel}
+                  stroke="#6b7280"
+                  tick={{ fill: '#6b7280' }}
+                />
+                <Tooltip
+                  cursor={{ strokeDasharray: '3 3' }}
+                  wrapperStyle={{ zIndex: 50 }}
+                  contentStyle={{
+                    backgroundColor: 'white',
+                    border: '1px solid #e5e7eb',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)',
+                  }}
+                />
+                <Scatter name="points" data={chartData} fill={COLORS[0]} />
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
         </div>
       );
 

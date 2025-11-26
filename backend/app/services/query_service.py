@@ -34,6 +34,8 @@ Available playbooks:
 - "segment_comparison": Compare two cohorts (e.g. outcome=1 vs outcome=0) on a key metric.
 - "outcome_breakdown": Show how often each outcome/target class occurs (class balance).
 - "feature_outcome_profile": Show how outcome rate changes across the range of a numeric feature.
+- "relationship": Show how two numeric features relate to each other (scatter plot).
+- "segmented_distribution": Show how a numeric feature differs across groups/segments.
 
 You can also set numeric detail parameters when relevant:
 - "top_n": how many top items to show (e.g. top 10 correlated features).
@@ -58,10 +60,12 @@ User question: "{user_query}"
 
 Return a JSON object ONLY, with this structure:
 {{
-  "playbook": "overview" | "correlation" | "distribution" | "segment_comparison" | "outcome_breakdown" | "feature_outcome_profile",
+  "playbook": "overview" | "correlation" | "distribution" | "segment_comparison" | "outcome_breakdown" | "feature_outcome_profile" | "relationship" | "segmented_distribution",
   "target": "column_name or null",              // for correlation, outcome_breakdown & feature_outcome_profile
   "feature": "column_name or null",             // for distribution & feature_outcome_profile (numeric)
   "segment_column": "column_name or null",      // for segment_comparison (categorical/boolean)
+  "feature_x": "column_name or null",           // for relationship (numeric)
+  "feature_y": "column_name or null",           // for relationship (numeric)
   "top_n": number or null,                      // for correlation or any ranking-style output
   "bins": number or null,                       // for distribution / feature_outcome_profile
   "filter_segment": {{ "column": string, "value": string | number | boolean }} | null,
@@ -77,6 +81,8 @@ Rules:
 - Use "segment_comparison" when the user asks to compare two groups or cohorts (e.g. outcome=1 vs outcome=0, men vs women).
 - Use "outcome_breakdown" when the user asks how often the outcome/target occurs, or for class balance / base rate.
 - Use "feature_outcome_profile" when the user asks how the outcome changes as a feature increases/decreases (e.g. outcome vs glucose levels).
+- Use "relationship" when the user asks how two specific numeric features relate to each other (e.g. pregnancies vs age).
+- Use "segmented_distribution" when the user asks how the distribution of a feature differs across groups (e.g. glucose by outcome).
 - When the user mentions a specific count like "top 3" or "top 10", set "top_n" accordingly (within 3-20).
 - When the user asks for more or fewer "buckets" / "ranges" / "granularity", adjust "bins" between 5 and 30.
  - Use "filter_segment" when the user restricts analysis to a group (e.g. only Outcome=1, or only Age > 60).
@@ -113,6 +119,8 @@ Rules:
         target = response.get("target")
         feature = response.get("feature")
         segment_column = response.get("segment_column")
+        feature_x = response.get("feature_x")
+        feature_y = response.get("feature_y")
         top_n = response.get("top_n")
         bins = response.get("bins")
         filter_segment = response.get("filter_segment")
@@ -128,6 +136,8 @@ Rules:
             "segment_comparison",
             "outcome_breakdown",
             "feature_outcome_profile",
+            "relationship",
+            "segmented_distribution",
         }
         if playbook not in allowed_playbooks:
             playbook = "overview"
@@ -146,25 +156,40 @@ Rules:
                 if target:
                     break
 
+        # Collect any mentioned columns in the user's question
+        mentioned_columns: list[str] = []
+        for table in schema_info.get("tables", []):
+            for col in table.get("columns", []):
+                col_name = col["name"]
+                col_lower = col_name.lower()
+                if col_lower in lower_query:
+                    mentioned_columns.append(col_name)
+
         # Additional heuristic for correlation:
         # If the user clearly mentions a specific column name (e.g. "Pregnancies") and
         # target is still empty or points to a generic outcome column, treat that
         # mentioned column as the correlation target instead.
         if playbook == "correlation":
-            mentioned_columns = []
-            for table in schema_info.get("tables", []):
-                for col in table.get("columns", []):
-                    col_name = col["name"]
-                    col_lower = col_name.lower()
-                    if col_lower in lower_query:
-                        mentioned_columns.append(col_name)
-
-            # Prefer non-outcome-like columns when the query mentions them
             non_outcome_mentions = [
                 c for c in mentioned_columns if c.lower() not in candidate_names
             ]
             if non_outcome_mentions and (not target or target.lower() in candidate_names):
                 target = non_outcome_mentions[0]
+
+        # Heuristic for relationship: if two columns are clearly mentioned,
+        # prefer them as feature_x and feature_y.
+        if playbook == "relationship":
+            numeric_columns = {
+                col["name"]
+                for table in schema_info.get("tables", [])
+                for col in table.get("columns", [])
+                if col.get("type") == "number"
+            }
+            # Filter mentioned columns to numerics
+            numeric_mentions = [c for c in mentioned_columns if c in numeric_columns]
+            if len(numeric_mentions) >= 2:
+                feature_x = feature_x or numeric_mentions[0]
+                feature_y = feature_y or numeric_mentions[1]
 
         # Clamp numeric detail parameters to reasonable ranges
         if isinstance(top_n, (int, float)):
@@ -194,6 +219,8 @@ Rules:
             "target": target,
             "feature": feature,
             "segment_column": segment_column,
+            "feature_x": feature_x,
+            "feature_y": feature_y,
             "top_n": top_n,
             "bins": bins,
             "filter_segment": filter_segment,
