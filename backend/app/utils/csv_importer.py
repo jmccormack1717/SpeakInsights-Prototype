@@ -103,6 +103,20 @@ class CSVImporter:
             
             # Sanitize column names
             df.columns = [CSVImporter.sanitize_column_name(col) for col in df.columns]
+
+            # Light data cleaning: drop columns that are almost entirely missing
+            # This keeps the schema simpler and avoids charts built on empty data.
+            missing_fraction = df.isna().mean()
+            dropped_columns = [
+                col for col, frac in missing_fraction.items()
+                if frac >= 0.98  # 98%+ missing values → treat as unusable
+            ]
+            if dropped_columns:
+                df = df.drop(columns=dropped_columns)
+                if df.empty:
+                    raise ValueError(
+                        "All columns were dropped because they were almost entirely missing."
+                    )
             
             # Determine table name
             if not table_name:
@@ -170,7 +184,9 @@ class CSVImporter:
                     "table_name": table_name,
                     "rows_imported": rows_inserted,
                     "columns": list(df.columns),
-                    "column_count": len(df.columns)
+                    "column_count": len(df.columns),
+                    "dropped_columns": dropped_columns,
+                    "dropped_column_count": len(dropped_columns),
                 }
         
         except pd.errors.EmptyDataError:

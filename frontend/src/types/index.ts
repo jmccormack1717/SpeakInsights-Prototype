@@ -100,3 +100,14 @@ export interface Dataset {
   created_at?: number;
 }
 
+export interface CsvUploadResult {
+  success: boolean;
+  message: string;
+  table_name: string;
+  rows_imported: number;
+  columns: string[];
+  column_count: number;
+  dropped_columns?: string[];
+  dropped_column_count?: number;
+}
+

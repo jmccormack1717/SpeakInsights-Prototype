@@ -65,7 +65,21 @@ export function DatasetSelector() {
       await datasetApi.createDataset(currentUserId, safeId, baseName);
 
       // Upload CSV into that dataset
-      await datasetApi.uploadCSV(currentUserId, safeId, file);
+      const uploadResult = await datasetApi.uploadCSV(currentUserId, safeId, file);
+
+      // If we dropped any mostly-empty columns, surface a friendly info message
+      if (uploadResult.dropped_column_count && uploadResult.dropped_column_count > 0) {
+        const count = uploadResult.dropped_column_count;
+        const colList =
+          uploadResult.dropped_columns && uploadResult.dropped_columns.length > 0
+            ? ` (${uploadResult.dropped_columns.join(', ')})`
+            : '';
+        setError(
+          `Imported your dataset and removed ${count} mostly-empty column${
+            count > 1 ? 's' : ''
+          } due to missing data${colList}.`,
+        );
+      }
 
       // Refresh list and select the new dataset
       const list = await datasetApi.listDatasets(currentUserId);

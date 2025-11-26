@@ -52,7 +52,18 @@ Please provide a concise, easy-to-understand analysis with:
 2. Key findings (3-5 bullet points highlighting important patterns or numbers)
 3. Notable patterns or anomalies (if any)
 4. Recommendations (if applicable, 1-2 actionable insights)
-5. 2-4 follow-up questions the user could ask next to go deeper (short, natural-language questions).
+5. 2-4 follow-up questions the user could ask next to go deeper.
+
+Follow-up question rules:
+- Each follow-up must be a short, direct question the user can paste back into the assistant.
+- Use imperative or direct wording like "Show", "Give me", "Compare", or "Explore" instead of "Would you like".
+- Only suggest follow-ups the system can actually handle, for example:
+  * "Give me a high-level overview of this dataset, including numeric ranges and missing values."
+  * "Show which numeric features are most related to the main outcome or target in this dataset."
+  * "Show the distribution of an important numeric feature in this dataset (such as glucose, BMI, or age)."
+  * "Compare two important groups in this dataset on a key metric, such as outcome rate or row count."
+  * "Show a breakdown of the main outcome or target across the dataset."
+- Do not suggest follow-ups that require external data, advanced modeling, or actions outside this dataset.
 
 Formatting rules:
 - Do NOT mention SQL, queries, tables, columns, or code.
@@ -81,13 +92,26 @@ Return JSON format only:
         
         try:
             response = await self.llm.generate_json(messages, temperature=0.5)
-            
+
+            raw_follow_ups = response.get("follow_ups") or []
+            follow_ups: List[str] = [
+                q for q in raw_follow_ups if isinstance(q, str) and q.strip()
+            ]
+
+            if not follow_ups:
+                follow_ups = [
+                    "Give me a high-level overview of this dataset, including numeric ranges and missing values.",
+                    "Show which numeric features are most related to the main outcome or target in this dataset.",
+                    "Show the distribution of an important numeric feature in this dataset (for example, glucose, BMI, or age).",
+                    "Compare two important groups in this dataset on a key metric, such as outcome rate or row count.",
+                ]
+
             return {
                 "summary": response.get("summary", ""),
                 "key_findings": response.get("key_findings", []),
                 "patterns": response.get("patterns", []),
                 "recommendations": response.get("recommendations", []),
-                "follow_ups": response.get("follow_ups", []),
+                "follow_ups": follow_ups,
             }
         except Exception as e:
             # Fallback to basic analysis if LLM fails

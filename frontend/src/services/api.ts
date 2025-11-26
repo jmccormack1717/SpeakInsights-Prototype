@@ -1,6 +1,6 @@
 /** API client for backend communication */
 import axios from 'axios';
-import type { QueryRequest, QueryResponse, Dataset, AuthResponse } from '../types';
+import type { QueryRequest, QueryResponse, Dataset, AuthResponse, CsvUploadResult } from '../types';
 
 // Ensure API URL ends with /api/v1
 const getApiBaseUrl = () => {
@@ -137,14 +137,14 @@ export const datasetApi = {
     datasetId: string,
     file: File,
     tableName?: string
-  ): Promise<any> {
+  ): Promise<CsvUploadResult> {
     const formData = new FormData();
     formData.append('file', file);
     if (tableName) {
       formData.append('table_name', tableName);
     }
 
-    const response = await apiClient.post(
+    const response = await apiClient.post<CsvUploadResult>(
       `/datasets/${userId}/${datasetId}/upload`,
       formData,
       {
