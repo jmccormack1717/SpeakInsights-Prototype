@@ -11,7 +11,8 @@ export function QueryChat() {
     isLoading, 
     setLoading, 
     setError, 
-    setResponse,
+    addTurn,
+    attachResponseToTurn,
     currentUserId,
     currentDatasetId,
     presetQuestion,
@@ -35,8 +36,9 @@ export function QueryChat() {
       return;
     }
 
-    // Clear any previous response so the user sees a fresh loading state
-    setResponse(null);
+    const trimmed = question.trim();
+    // Append a new turn so it shows up immediately in the conversation
+    const turnId = addTurn(trimmed);
 
     setLoading(true);
     setError(null);
@@ -45,11 +47,11 @@ export function QueryChat() {
       const request: QueryRequest = {
         user_id: currentUserId,
         dataset_id: currentDatasetId,
-        query: question.trim(),
+        query: trimmed,
       };
 
       const response = await queryApi.executeQuery(request);
-      setResponse(response);
+      attachResponseToTurn(turnId, response);
       setQuestion(''); // Clear input after successful analysis
     } catch (error: any) {
       // Log full error to console for debugging, but show a friendly message to the user

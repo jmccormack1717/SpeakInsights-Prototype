@@ -1,8 +1,23 @@
 /** Panel displaying textual analysis and insights */
 import type { TextualAnalysis } from '../types';
 import { Lightbulb, TrendingUp, AlertCircle, Sparkles, MessageCircle } from 'lucide-react';
+import { useQueryStore } from '../stores/queryStore';
 
 export function AnalysisPanel({ analysis }: { analysis: TextualAnalysis }) {
+  const { setPresetQuestion, currentDatasetId } = useQueryStore();
+
+  const handleFollowUpClick = (question: string) => {
+    if (!currentDatasetId) return;
+    setPresetQuestion(question);
+
+    const el = document.getElementById('query-input');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Try to focus the input for quicker editing/submission
+      (el as HTMLInputElement).focus?.();
+    }
+  };
+
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 p-6 sm:p-8 space-y-6">
       <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
@@ -87,7 +102,10 @@ export function AnalysisPanel({ analysis }: { analysis: TextualAnalysis }) {
             {analysis.follow_ups.map((q, idx) => (
               <li
                 key={idx}
-                className="px-3 py-1.5 text-xs rounded-full bg-si-primary-soft text-si-primary-strong border border-si-primary/20"
+                className="px-3 py-1.5 text-xs rounded-full bg-si-primary-soft text-si-primary-strong border border-si-primary/20 cursor-pointer hover:bg-si-primary-soft/70 hover:border-si-primary/40 transition-colors"
+                onClick={() => handleFollowUpClick(q)}
+                role="button"
+                aria-label={`Ask follow-up: ${q}`}
               >
                 {q}
               </li>

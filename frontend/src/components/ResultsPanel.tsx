@@ -5,9 +5,10 @@ import { AnalysisPanel } from './AnalysisPanel';
 import { Loader2 } from 'lucide-react';
 
 export function ResultsPanel() {
-  const { currentResponse, error, isLoading } = useQueryStore();
+  const { history, error, isLoading } = useQueryStore();
+  const hasTurns = history.length > 0;
 
-  if (isLoading) {
+  if (!hasTurns && isLoading) {
     return (
       <div className="w-full mt-8 py-12 flex flex-col items-center justify-center gap-4 bg-si-surface rounded-2xl border border-si-border/70 shadow-si-soft">
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-si-primary-soft">
@@ -45,7 +46,7 @@ export function ResultsPanel() {
     );
   }
 
-  if (!currentResponse) {
+  if (!hasTurns) {
     return (
       <div className="w-full mt-8 text-center py-12">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-si-primary-soft mb-4">
@@ -59,30 +60,59 @@ export function ResultsPanel() {
     );
   }
 
-  const secondaryCharts = currentResponse.extra_visualizations || [];
-
   return (
-    <div className="w-full mt-6 space-y-5">
-      {/* Visualization - Prominent */}
-      <div className="bg-si-elevated rounded-2xl shadow-si-soft border border-si-border/70 p-6 sm:p-8">
-        <ChartRenderer config={currentResponse.visualization} />
-      </div>
+    <div className="w-full mt-6 space-y-4">
+      {history.map((turn, idx) => {
+        const isLast = idx === history.length - 1;
+        const response = turn.response;
+        const secondaryCharts = response?.extra_visualizations || [];
 
-      {secondaryCharts.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {secondaryCharts.map((viz, idx) => (
-            <div
-              key={idx}
-              className="bg-si-surface rounded-2xl shadow-sm border border-si-border/60 p-4"
-            >
-              <ChartRenderer config={viz} />
+        return (
+          <div
+            key={turn.id}
+            className="space-y-3 border border-si-border/60 rounded-2xl bg-si-surface/60 shadow-sm p-4 sm:p-5"
+          >
+            {/* User question */}
+            <div className="flex justify-end">
+              <div className="max-w-[80%] rounded-2xl bg-si-primary text-white px-4 py-2 text-sm shadow-sm">
+                {turn.question}
+              </div>
             </div>
-          ))}
-        </div>
-      )}
 
-      {/* Textual Analysis */}
-      <AnalysisPanel analysis={currentResponse.analysis} />
+            {/* Loading state for this turn */}
+            {!response && isLast && isLoading && (
+              <div className="flex items-center gap-2 text-xs text-si-muted mt-1">
+                <Loader2 className="w-4 h-4 animate-spin text-si-primary" />
+                <span>Analyzing your data for this question…</span>
+              </div>
+            )}
+
+            {/* Response content when ready */}
+            {response && (
+              <div className="space-y-4">
+                <div className="bg-si-elevated rounded-2xl shadow-si-soft border border-si-border/70 p-4 sm:p-6">
+                  <ChartRenderer config={response.visualization} />
+                </div>
+
+                {secondaryCharts.length > 0 && (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {secondaryCharts.map((viz, vIdx) => (
+                      <div
+                        key={vIdx}
+                        className="bg-si-surface rounded-2xl shadow-sm border border-si-border/60 p-4"
+                      >
+                        <ChartRenderer config={viz} />
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <AnalysisPanel analysis={response.analysis} />
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }

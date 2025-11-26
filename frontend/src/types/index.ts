@@ -6,6 +6,14 @@ export interface QueryRequest {
   query: string;
 }
 
+export interface AuthResponse {
+  access_token: string;
+  token_type: string;
+  user_id: string;
+  email: string;
+  full_name?: string | null;
+}
+
 export interface QueryResponse {
   sql: string;
   results: Record<string, any>[];

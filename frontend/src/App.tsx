@@ -5,11 +5,16 @@ import { QueryChat } from './components/QueryChat';
 import { ResultsPanel } from './components/ResultsPanel';
 import { DatasetSelector } from './components/DatasetSelector';
 import { PlaybookExamples } from './components/PlaybookExamples';
+import { AuthPanel } from './components/AuthPanel';
+import { useAuthStore } from './stores/authStore';
+import { useQueryStore } from './stores/queryStore';
 
 type Theme = 'light' | 'dark';
 
 function App() {
   const [theme, setTheme] = useState<Theme>('light');
+  const { initializeFromStorage, user } = useAuthStore();
+  const { setUserId } = useQueryStore();
 
   // Initialize theme from localStorage / OS preference
   useEffect(() => {
@@ -26,6 +31,19 @@ function App() {
     setTheme(initial);
     document.documentElement.classList.toggle('dark', initial === 'dark');
   }, []);
+
+  // Initialize auth from localStorage and sync user id into query store
+  useEffect(() => {
+    initializeFromStorage();
+  }, [initializeFromStorage]);
+
+  useEffect(() => {
+    if (user?.userId) {
+      setUserId(user.userId);
+    } else {
+      setUserId('default_user');
+    }
+  }, [user, setUserId]);
 
   const toggleTheme = () => {
     setTheme((prev) => {
@@ -80,6 +98,7 @@ function App() {
       </header>
 
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
+        <AuthPanel />
         <DatasetSelector />
         <PlaybookExamples />
         <QueryChat />

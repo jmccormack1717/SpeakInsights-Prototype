@@ -1,6 +1,6 @@
 /** API client for backend communication */
 import axios from 'axios';
-import type { QueryRequest, QueryResponse, Dataset } from '../types';
+import type { QueryRequest, QueryResponse, Dataset, AuthResponse } from '../types';
 
 // Ensure API URL ends with /api/v1
 const getApiBaseUrl = () => {
@@ -58,6 +58,31 @@ export const queryApi = {
    */
   async executeQuery(request: QueryRequest): Promise<QueryResponse> {
     const response = await apiClient.post<QueryResponse>('/query', request);
+    return response.data;
+  },
+};
+
+export const authApi = {
+  /**
+   * Sign up a new user
+   */
+  async signup(email: string, password: string, fullName?: string): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>('/auth/signup', {
+      email,
+      password,
+      full_name: fullName,
+    });
+    return response.data;
+  },
+
+  /**
+   * Log in an existing user
+   */
+  async login(email: string, password: string): Promise<AuthResponse> {
+    const response = await apiClient.post<AuthResponse>('/auth/login', {
+      email,
+      password,
+    });
     return response.data;
   },
 };

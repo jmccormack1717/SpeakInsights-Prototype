@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from app.config import settings
-from app.api.routes import query, datasets, schema
+from app.api.routes import query, datasets, schema, auth
 from app.core.database import db_manager
 from app.utils.csv_importer import CSVImporter
 
@@ -37,6 +37,7 @@ app.add_middleware(
 )
 
 # Include routers
+app.include_router(auth.router, prefix="/api/v1", tags=["auth"])
 app.include_router(query.router, prefix="/api/v1", tags=["query"])
 app.include_router(datasets.router, prefix="/api/v1", tags=["datasets"])
 app.include_router(schema.router, prefix="/api/v1", tags=["schema"])
