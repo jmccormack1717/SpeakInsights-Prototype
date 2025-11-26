@@ -13,8 +13,8 @@ type Theme = 'light' | 'dark';
 function App() {
   const [theme, setTheme] = useState<Theme>('light');
   const [hasStarted, setHasStarted] = useState<boolean>(false);
-  const { initializeFromStorage, user } = useAuthStore();
-  const { setUserId } = useQueryStore();
+  const { initializeFromStorage, user, logout } = useAuthStore();
+  const { setUserId, reset: resetQueryStore } = useQueryStore();
 
   // Initialize theme from localStorage / OS preference
   useEffect(() => {
@@ -70,6 +70,14 @@ function App() {
     setUserId('default_user');
   };
 
+  const handleLogout = () => {
+    logout();
+    resetQueryStore();
+    setUserId('default_user');
+    setHasStarted(false);
+    window.localStorage.removeItem('si-started');
+  };
+
   const header = (
     <header className="bg-si-surface/70 backdrop-blur-xl border-b border-si-border/60 shadow-sm sticky top-0 z-10">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
@@ -92,23 +100,34 @@ function App() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={toggleTheme}
-          className="inline-flex items-center gap-2 rounded-full border border-si-border/80 bg-si-surface/80 px-3 py-1.5 text-xs sm:text-sm text-si-muted hover:text-si-text hover:border-si-primary/70 hover:bg-si-primary-soft/40 shadow-sm transition-colors duration-200"
-        >
-          {theme === 'dark' ? (
-            <>
-              <Sun className="w-4 h-4 text-yellow-300" />
-              <span className="hidden sm:inline">Light mode</span>
-            </>
-          ) : (
-            <>
-              <Moon className="w-4 h-4 text-si-primary-strong" />
-              <span className="hidden sm:inline">Dark mode</span>
-            </>
+        <div className="flex items-center gap-2 sm:gap-3">
+          {user && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-si-border/80 bg-si-surface/80 px-3 py-1.5 text-xs text-si-muted hover:text-si-text hover:border-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              <span>Logout</span>
+            </button>
           )}
-        </button>
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="inline-flex items-center gap-2 rounded-full border border-si-border/80 bg-si-surface/80 px-3 py-1.5 text-xs sm:text-sm text-si-muted hover:text-si-text hover:border-si-primary/70 hover:bg-si-primary-soft/40 shadow-sm transition-colors duration-200"
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun className="w-4 h-4 text-yellow-300" />
+                <span className="hidden sm:inline">Light mode</span>
+              </>
+            ) : (
+              <>
+                <Moon className="w-4 h-4 text-si-primary-strong" />
+                <span className="hidden sm:inline">Dark mode</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </header>
   );

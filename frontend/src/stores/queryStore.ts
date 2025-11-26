@@ -43,7 +43,9 @@ const initialState: Omit<QueryState, 'setLoading' | 'setError' | 'setResponse' |
     currentResponse: null,
     history: [],
     currentUserId: 'default_user',
-    currentDatasetId: null,
+    // Default to the built-in PIMA dataset; DatasetSelector will overwrite this
+    // if the user uploads or selects another dataset.
+    currentDatasetId: 'mvp_dataset',
     datasets: [],
     presetQuestion: null,
   };
