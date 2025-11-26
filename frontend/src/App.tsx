@@ -117,8 +117,8 @@ function App() {
     return (
       <div className="min-h-screen bg-si-bg text-si-text transition-colors duration-300 flex flex-col">
         {header}
-        {/* Clean launch page with a single centered auth card (login/signup) and demo CTA */}
-        <main className="flex-1 max-w-xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16 space-y-8 sm:space-y-10">
+        {/* Clean launch page with a single wide auth card (login/signup) and demo CTA */}
+        <main className="flex-1 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-16 space-y-8 sm:space-y-10">
           {/* Intro copy */}
           <section className="space-y-4 text-center">
             <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-si-text leading-tight">
@@ -130,8 +130,8 @@ function App() {
             </p>
           </section>
 
-          {/* Single auth card: login/signup + demo CTA */}
-          <section>
+          {/* Single, extra-wide auth card: login/signup + demo CTA */}
+          <section className="max-w-4xl w-full mx-auto">
             <AuthPanel onAuthenticated={handleStartDemo} onStartDemo={handleStartDemo} />
           </section>
         </main>
