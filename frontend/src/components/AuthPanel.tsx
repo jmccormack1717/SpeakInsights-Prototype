@@ -66,40 +66,40 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
   };
 
   return (
-    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-sm p-4 sm:p-5">
-      <div className="flex items-center justify-between gap-3 mb-3">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-si-primary-soft flex items-center justify-center">
-            <Lock className="w-4 h-4 text-si-primary" />
+    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-sm p-5 sm:p-7">
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg bg-si-primary-soft flex items-center justify-center">
+            <Lock className="w-4.5 h-4.5 text-si-primary" />
           </div>
           <div>
-            <h2 className="text-sm font-semibold text-si-text">
+            <h2 className="text-base sm:text-lg font-semibold text-si-text">
               {mode === 'login' ? 'Sign in to personalize datasets' : 'Create an account'}
             </h2>
-            <p className="text-xs text-si-muted">
+            <p className="text-xs sm:text-sm text-si-muted">
               Use your own user space while keeping the demo-friendly PIMA dataset.
             </p>
           </div>
         </div>
-        <div className="inline-flex rounded-full bg-si-bg border border-si-border/80 p-0.5 text-[11px]">
+        <div className="inline-flex rounded-full bg-si-bg border border-si-border/80 p-0.5 text-[12px] sm:text-xs">
           <button
             type="button"
             onClick={() => setMode('login')}
-            className={`px-2 py-1 rounded-full flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 ${
               mode === 'login' ? 'bg-si-primary text-white' : 'text-si-muted'
             }`}
           >
-            <LogIn className="w-3 h-3" />
+            <LogIn className="w-3.5 h-3.5" />
             <span>Sign in</span>
           </button>
           <button
             type="button"
             onClick={() => setMode('signup')}
-            className={`px-2 py-1 rounded-full flex items-center gap-1 ${
+            className={`px-3 py-1.5 rounded-full flex items-center gap-1.5 ${
               mode === 'signup' ? 'bg-si-primary text-white' : 'text-si-muted'
             }`}
           >
-            <UserPlus className="w-3 h-3" />
+            <UserPlus className="w-3.5 h-3.5" />
             <span>Sign up</span>
           </button>
         </div>
@@ -107,39 +107,39 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
 
       <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
         <div className="sm:col-span-1">
-          <label className="block text-xs font-medium text-si-muted mb-1">Email</label>
+          <label className="block text-sm font-medium text-si-muted mb-1.5">Email</label>
           <div className="relative">
-            <Mail className="w-3.5 h-3.5 text-si-muted absolute left-3 top-1/2 -translate-y-1/2" />
+            <Mail className="w-4 h-4 text-si-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full pl-8 pr-3 py-2 rounded-xl border border-si-border/70 bg-si-bg text-sm text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-si-border/70 bg-si-bg text-sm sm:text-base text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
               required
             />
           </div>
         </div>
         {mode === 'signup' && (
           <div className="sm:col-span-1">
-            <label className="block text-xs font-medium text-si-muted mb-1">Name (optional)</label>
+            <label className="block text-sm font-medium text-si-muted mb-1.5">Name (optional)</label>
             <input
               type="text"
               value={fullName}
               onChange={(e) => setFullName(e.target.value)}
               placeholder="Your name"
-              className="w-full px-3 py-2 rounded-xl border border-si-border/70 bg-si-bg text-sm text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
+              className="w-full px-3.5 py-2.5 rounded-xl border border-si-border/70 bg-si-bg text-sm sm:text-base text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
             />
           </div>
         )}
         <div className={mode === 'signup' ? 'sm:col-span-1' : 'sm:col-span-1'}>
-          <label className="block text-xs font-medium text-si-muted mb-1">Password</label>
+          <label className="block text-sm font-medium text-si-muted mb-1.5">Password</label>
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-3 py-2 rounded-xl border border-si-border/70 bg-si-bg text-sm text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
+            className="w-full px-3.5 py-2.5 rounded-xl border border-si-border/70 bg-si-bg text-sm sm:text-base text-si-text focus:outline-none focus:ring-2 focus:ring-si-primary"
             required
           />
         </div>
@@ -147,7 +147,7 @@ export function AuthPanel({ onAuthenticated }: AuthPanelProps) {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-gradient-to-r from-si-primary to-si-primary-strong text-white text-xs font-medium shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
+            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-si-primary to-si-primary-strong text-white text-sm font-medium shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {isSubmitting ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
           </button>

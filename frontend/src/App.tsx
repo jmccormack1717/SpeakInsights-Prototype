@@ -117,13 +117,14 @@ function App() {
     return (
       <div className="min-h-screen bg-si-bg text-si-text transition-colors duration-300 flex flex-col">
         {header}
-        <main className="flex-1 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 grid gap-8 lg:grid-cols-2 items-stretch">
-          <section className="space-y-6 flex flex-col justify-center">
-            <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-si-text">
+        {/* Landing hero with plenty of whitespace, but larger, more readable center content */}
+        <main className="flex-1 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 grid gap-10 lg:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)] items-stretch">
+          <section className="space-y-7 flex flex-col justify-center">
+            <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-si-text">
               Ask questions about your data,
               <span className="text-si-primary"> get instant charts & insights.</span>
             </h2>
-            <p className="text-sm sm:text-base text-si-muted max-w-xl">
+            <p className="text-base sm:text-lg text-si-muted max-w-xl">
               Drop in a CSV or start with the built-in PIMA demo dataset. SpeakInsights turns your natural-language
               questions into visual summaries and AI-written analysis.
             </p>
