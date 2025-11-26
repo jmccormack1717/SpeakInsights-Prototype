@@ -1,6 +1,6 @@
-/** Simple authentication card used on the launch page (login OR signup). */
+/** Authentication card for the launch page: login / signup + optional demo CTA. */
 import { useState } from 'react';
-import { Lock, LogIn, UserPlus, Mail } from 'lucide-react';
+import { Lock, LogIn, UserPlus, Mail, PlayCircle } from 'lucide-react';
 import { authApi } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { useQueryStore } from '../stores/queryStore';
@@ -8,11 +8,12 @@ import { useQueryStore } from '../stores/queryStore';
 type Mode = 'login' | 'signup';
 
 interface AuthPanelProps {
-  mode: Mode;
   onAuthenticated?: () => void;
+  onStartDemo?: () => void;
 }
 
-export function AuthPanel({ mode, onAuthenticated }: AuthPanelProps) {
+export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
+  const [mode, setMode] = useState<Mode>('login');
   const [email, setEmail] = useState('');
   const [fullName, setFullName] = useState('');
   const [password, setPassword] = useState('');
@@ -66,33 +67,39 @@ export function AuthPanel({ mode, onAuthenticated }: AuthPanelProps) {
   };
 
   return (
-    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-md p-6 sm:p-8 min-h-[260px] sm:min-h-[300px]">
-      <div className="flex items-center justify-between gap-4 mb-4">
+    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-md p-6 sm:p-7 space-y-5">
+      <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-9 h-9 rounded-lg bg-si-primary-soft flex items-center justify-center">
-            <Lock className="w-4.5 h-4.5 text-si-primary" />
+            <Lock className="w-4 h-4 text-si-primary" />
           </div>
           <div>
             <h2 className="text-lg sm:text-xl font-semibold text-si-text">
-              {mode === 'login' ? 'Sign in to personalize datasets' : 'Create an account'}
+              {mode === 'login' ? 'Sign in to SpeakInsights' : 'Create an account'}
             </h2>
             <p className="text-sm text-si-muted">
               Use your own user space while keeping the demo-friendly PIMA dataset.
             </p>
           </div>
         </div>
-        <div className="inline-flex rounded-full bg-si-bg border border-si-border/80 px-3 py-1.5 text-[12px] sm:text-xs text-si-muted">
+        <button
+          type="button"
+          className="text-[11px] sm:text-xs text-si-muted hover:text-si-primary transition-colors"
+          onClick={() => {
+            setMode((prev) => (prev === 'login' ? 'signup' : 'login'));
+            setError(null);
+          }}
+        >
           {mode === 'login' ? (
-            <div className="inline-flex items-center gap-1.5 text-si-primary">
-              <LogIn className="w-3.5 h-3.5" />
-              <span className="font-medium">Login</span>
-            </div>
+            <span>
+              New here? <span className="font-semibold">Create account</span>
+            </span>
           ) : (
-            <div className="inline-flex items-center gap-1.5 text-si-primary">
-              <UserPlus className="w-3.5 h-3.5" />
-              <span className="font-medium">Sign up</span>
-            </div>
+            <span>
+              Already have an account? <span className="font-semibold">Log in</span>
+            </span>
           )}
+        </button>
         </div>
       </div>
 
@@ -144,6 +151,20 @@ export function AuthPanel({ mode, onAuthenticated }: AuthPanelProps) {
           </button>
         </div>
       </form>
+
+      <div className="pt-3 border-t border-si-border/60 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+        <p className="text-[11px] sm:text-xs text-si-muted">
+          Or, explore instantly with the built-in demo dataset.
+        </p>
+        <button
+          type="button"
+          onClick={onStartDemo}
+          className="inline-flex items-center gap-1.5 rounded-full border border-si-primary/70 text-si-primary px-3.5 py-1.5 text-[11px] sm:text-xs font-medium hover:bg-si-primary-soft/40"
+        >
+          <PlayCircle className="w-3.5 h-3.5" />
+          <span>Start instant demo</span>
+        </button>
+      </div>
 
       {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
     </div>
