@@ -99,7 +99,9 @@ export function DatasetSelector() {
     }
   };
 
-  const activeDataset = datasets.find((d) => d.dataset_id === currentDatasetId) || PIMA_DATASET;
+  const activeDataset =
+    datasets.find((d: Dataset) => d.dataset_id === currentDatasetId) || PIMA_DATASET;
+  const customDatasets = datasets.filter((d: Dataset) => d.dataset_id !== PIMA_DATASET.dataset_id);
 
   return (
     <div className="w-full space-y-4">
@@ -139,6 +141,39 @@ export function DatasetSelector() {
         </button>
       </div>
 
+      {/* Custom dataset cards */}
+      {customDatasets.length > 0 && (
+        <div className="space-y-3">
+          {customDatasets.map((d: Dataset) => (
+            <div
+              key={d.dataset_id}
+              className="bg-si-surface rounded-2xl shadow-si-soft/40 border border-si-border/70 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-si-primary-soft rounded-2xl flex items-center justify-center shadow-sm">
+                  <Database className="w-5 h-5 text-si-primary-strong" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-si-text text-sm sm:text-base">{d.name}</h3>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDatasetId(d.dataset_id)}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+                  activeDataset.dataset_id === d.dataset_id
+                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-400/40 flex items-center gap-1'
+                    : 'bg-transparent text-si-text border-si-border/70 hover:border-si-primary hover:text-si-primary'
+                }`}
+              >
+                {activeDataset.dataset_id === d.dataset_id && <CheckCircle2 className="w-4 h-4" />}
+                {activeDataset.dataset_id === d.dataset_id ? 'Active' : 'Use this dataset'}
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {/* Custom CSV upload card */}
       <div className="bg-si-surface rounded-2xl border border-dashed border-si-border/70 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
@@ -149,16 +184,6 @@ export function DatasetSelector() {
           <p className="text-sm text-si-muted">
             Upload any tabular CSV file. We&apos;ll infer the schema and run the same analyses.
           </p>
-          {datasets.length > 1 && (
-            <p className="text-xs text-si-muted mt-2">
-              Recently used:{' '}
-              {datasets
-                .filter((d: Dataset) => d.dataset_id !== PIMA_DATASET.dataset_id)
-                .slice(0, 3)
-                .map((d: Dataset) => d.name)
-                .join(', ')}
-            </p>
-          )}
         </div>
         <label className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-si-primary text-white text-xs font-medium cursor-pointer hover:bg-si-primary-strong transition-colors">
           <Upload className="w-4 h-4" />
