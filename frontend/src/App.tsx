@@ -53,7 +53,7 @@ function App() {
                 <span className="text-si-primary-strong">Insights</span>
               </h1>
               <p className="text-xs sm:text-sm text-si-muted">
-                Prompt-driven data stories from your own dataset
+                Natural-language data analysis for any CSV dataset
               </p>
             </div>
           </div>
