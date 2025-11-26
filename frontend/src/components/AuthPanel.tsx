@@ -67,44 +67,26 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
   };
 
   return (
-    <div className="w-full bg-si-surface rounded-2xl border border-si-border/70 shadow-md p-6 sm:p-7 space-y-5">
-      <div className="flex items-start justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-si-primary-soft flex items-center justify-center">
-            <Lock className="w-4 h-4 text-si-primary" />
-          </div>
-          <div>
-            <h2 className="text-lg sm:text-xl font-semibold text-si-text">
-              {mode === 'login' ? 'Sign in to SpeakInsights' : 'Create an account'}
-            </h2>
-            <p className="text-sm text-si-muted">
-              Use your own user space while keeping the demo-friendly PIMA dataset.
-            </p>
-          </div>
+    <div className="w-full bg-si-surface rounded-3xl border border-si-border/70 shadow-lg shadow-black/20 p-6 sm:p-7 space-y-5">
+      {/* Logo + title row */}
+      <div className="flex flex-col items-center space-y-2 mb-1">
+        <div className="w-10 h-10 rounded-2xl bg-si-primary-soft flex items-center justify-center">
+          <Lock className="w-5 h-5 text-si-primary" />
         </div>
-        <button
-          type="button"
-          className="text-[11px] sm:text-xs text-si-muted hover:text-si-primary transition-colors"
-          onClick={() => {
-            setMode((prev) => (prev === 'login' ? 'signup' : 'login'));
-            setError(null);
-          }}
-        >
-          {mode === 'login' ? (
-            <span>
-              New here? <span className="font-semibold">Create account</span>
-            </span>
-          ) : (
-            <span>
-              Already have an account? <span className="font-semibold">Log in</span>
-            </span>
-          )}
-        </button>
+        <div className="text-center space-y-1">
+          <h2 className="text-lg sm:text-xl font-semibold text-si-text">
+            {mode === 'login' ? 'Sign in to SpeakInsights' : 'Create your SpeakInsights account'}
+          </h2>
+          <p className="text-xs sm:text-sm text-si-muted">
+            Use your own space while keeping the demo-friendly PIMA dataset.
+          </p>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-        <div className="sm:col-span-1">
-          <label className="block text-sm font-medium text-si-muted mb-1.5">Email</label>
+      {/* Form fields */}
+      <form onSubmit={handleSubmit} className="space-y-3">
+        <div className="space-y-1.5">
+          <label className="block text-xs font-medium text-si-muted">Email</label>
           <div className="relative">
             <Mail className="w-4 h-4 text-si-muted absolute left-3 top-1/2 -translate-y-1/2" />
             <input
@@ -117,9 +99,10 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
             />
           </div>
         </div>
+
         {mode === 'signup' && (
-          <div className="sm:col-span-1">
-            <label className="block text-sm font-medium text-si-muted mb-1.5">Name (optional)</label>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-medium text-si-muted">Name (optional)</label>
             <input
               type="text"
               value={fullName}
@@ -129,8 +112,12 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
             />
           </div>
         )}
-        <div className={mode === 'signup' ? 'sm:col-span-1' : 'sm:col-span-1'}>
-          <label className="block text-sm font-medium text-si-muted mb-1.5">Password</label>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center justify-between">
+            <label className="block text-xs font-medium text-si-muted">Password</label>
+            {/* Placeholder for future "Forgot password?" link */}
+          </div>
           <input
             type="password"
             value={password}
@@ -140,17 +127,17 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
             required
           />
         </div>
-        <div className="sm:col-span-1 flex justify-end">
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-si-primary to-si-primary-strong text-white text-sm font-medium shadow-sm hover:shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
-          </button>
-        </div>
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="mt-2 w-full inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-si-primary to-si-primary-strong text-white text-sm font-medium shadow-md hover:shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+        >
+          {isSubmitting ? 'Please wait…' : mode === 'login' ? 'Sign in' : 'Create account'}
+        </button>
       </form>
 
+      {/* Demo CTA */}
       <div className="pt-4 border-t border-si-border/60 space-y-3 text-center">
         <p className="text-[11px] sm:text-xs text-si-muted">
           Just want to see it in action first?
@@ -165,7 +152,29 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
         </button>
       </div>
 
-      {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+      {/* Mode switch */}
+      <div className="pt-2 text-center">
+        <button
+          type="button"
+          className="text-[11px] sm:text-xs text-si-muted hover:text-si-primary transition-colors"
+          onClick={() => {
+            setMode((prev) => (prev === 'login' ? 'signup' : 'login'));
+            setError(null);
+          }}
+        >
+          {mode === 'login' ? (
+            <span>
+              Don&apos;t have an account? <span className="font-semibold">Create one</span>
+            </span>
+          ) : (
+            <span>
+              Already have an account? <span className="font-semibold">Sign in</span>
+            </span>
+          )}
+        </button>
+      </div>
+
+      {error && <p className="mt-2 text-xs text-red-500 text-center">{error}</p>}
     </div>
   );
 }

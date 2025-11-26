@@ -101,13 +101,15 @@ function App() {
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
-          <button
-            type="button"
-            onClick={handleLogout}
-            className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-si-border/80 bg-si-surface/80 px-3 py-1.5 text-xs text-si-muted hover:text-si-text hover:border-red-400 hover:bg-red-500/10 transition-colors"
-          >
-            <span>{user ? 'Logout' : 'Back to launch'}</span>
-          </button>
+          {hasStarted && (
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-si-border/80 bg-si-surface/80 px-3 py-1.5 text-xs text-si-muted hover:text-si-text hover:border-red-400 hover:bg-red-500/10 transition-colors"
+            >
+              <span>{user ? 'Logout' : 'Back to launch'}</span>
+            </button>
+          )}
           <button
             type="button"
             onClick={toggleTheme}
@@ -134,23 +136,23 @@ function App() {
     return (
       <div className="min-h-screen bg-si-bg text-si-text transition-colors duration-300 flex flex-col">
         {header}
-        {/* Clean launch page with a single wide auth card (login/signup) and demo CTA */}
-        <main className="flex-1 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16 py-10 sm:py-16 space-y-8 sm:space-y-10">
-          {/* Intro copy */}
-          <section className="space-y-4 text-center">
-            <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-si-text leading-tight">
-              <span className="block">Ask questions about your data,</span>
-              <span className="block text-si-primary">get instant charts & insights.</span>
-            </h2>
-            <p className="text-sm sm:text-base text-si-muted max-w-2xl mx-auto">
-              Log in to use your own datasets, or jump straight into the demo—one clean place to talk to your data.
-            </p>
-          </section>
+        {/* Modern, centered auth card (login/signup + demo), à la Scheme/Microsoft */}
+        <main className="flex-1 flex items-center justify-center px-4 sm:px-6 py-10 sm:py-16">
+          <div className="w-full max-w-md space-y-6">
+            <div className="text-center space-y-2">
+              <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-si-text">
+                Ask questions about your data,
+              </h2>
+              <p className="text-base font-semibold text-si-primary">
+                get instant charts &amp; insights.
+              </p>
+              <p className="text-xs sm:text-sm text-si-muted">
+                Log in to use your own datasets, or start with the PIMA demo—one clean place to talk to your data.
+              </p>
+            </div>
 
-          {/* Single, extra-wide auth card: login/signup + demo CTA */}
-          <section className="max-w-4xl w-full mx-auto">
             <AuthPanel onAuthenticated={handleStartDemo} onStartDemo={handleStartDemo} />
-          </section>
+          </div>
         </main>
       </div>
     );
