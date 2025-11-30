@@ -27,7 +27,7 @@ describe('QueryChat', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
-    (useQueryStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ;(useQueryStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       isLoading: false,
       setLoading: mockSetLoading,
       setError: mockSetError,
@@ -116,7 +116,7 @@ describe('QueryChat', () => {
       data_structure: {},
     }
     
-    (queryApi.executeQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse)
+    ;(queryApi.executeQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse)
 
     render(<QueryChat />)
     
@@ -141,7 +141,7 @@ describe('QueryChat', () => {
     const user = userEvent.setup()
     const error = new Error('API Error')
     
-    (queryApi.executeQuery as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error)
+    ;(queryApi.executeQuery as unknown as ReturnType<typeof vi.fn>).mockRejectedValue(error)
 
     render(<QueryChat />)
     
