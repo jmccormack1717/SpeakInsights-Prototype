@@ -16,7 +16,7 @@ export interface AuthResponse {
 
 export interface QueryResponse {
   sql: string;
-  results: Record<string, any>[];
+  results: Record<string, unknown>[];
   visualization: VisualizationConfig;
   extra_visualizations?: VisualizationConfig[];
   analysis: TextualAnalysis;
@@ -59,7 +59,7 @@ export interface ChartData {
   values?: number[];
   x?: (string | number)[];
   y?: number[];
-  rows?: Record<string, any>[];
+  rows?: Record<string, unknown>[];
   columns?: string[];
   matrix?: number[][];
 }
@@ -109,5 +109,21 @@ export interface CsvUploadResult {
   column_count: number;
   dropped_columns?: string[];
   dropped_column_count?: number;
+}
+
+export interface SchemaColumn {
+  name: string;
+  type: string;
+  nullable: boolean;
+}
+
+export interface SchemaTable {
+  name: string;
+  columns: SchemaColumn[];
+  sample_rows?: Record<string, unknown>[];
+}
+
+export interface SchemaInfo {
+  tables: SchemaTable[];
 }
 

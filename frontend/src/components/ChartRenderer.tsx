@@ -1,4 +1,5 @@
 /** Dynamic chart renderer component */
+import type { ChartData } from '../types'
 import {
   BarChart,
   Bar,
@@ -426,7 +427,7 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
     default:
       if (data?.columns && data?.rows) {
         const columns = data.columns as string[];
-        const rows = data.rows as any[];
+        const rows = data.rows as Record<string, unknown>[];
 
         return (
           <div className="w-full">
@@ -476,10 +477,17 @@ export function ChartRenderer({ config }: { config: VisualizationConfig }) {
   }
 }
 
+interface ChartDataPoint {
+  name?: string;
+  value?: number;
+  x?: string | number;
+  y?: number;
+}
+
 function prepareChartData(
-  data: any,
+  data: ChartData,
   type: string
-): any[] {
+): ChartDataPoint[] {
   if (type === 'bar' || type === 'horizontal_bar') {
     return data.labels?.map((label: string, idx: number) => ({
       name: label,
@@ -488,7 +496,7 @@ function prepareChartData(
   }
 
   if (type === 'line') {
-    return data.x?.map((x: any, idx: number) => ({
+    return data.x?.map((x: string | number, idx: number) => ({
       x,
       y: data.y?.[idx] || 0,
     })) || [];
@@ -502,7 +510,7 @@ function prepareChartData(
   }
 
   if (type === 'scatter') {
-    return data.x?.map((x: any, idx: number) => ({
+    return data.x?.map((x: string | number, idx: number) => ({
       x,
       y: data.y?.[idx] || 0,
     })) || [];

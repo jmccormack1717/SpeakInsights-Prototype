@@ -1,6 +1,6 @@
 /** API client for backend communication */
 import axios from 'axios';
-import type { QueryRequest, QueryResponse, Dataset, AuthResponse, CsvUploadResult } from '../types';
+import type { QueryRequest, QueryResponse, Dataset, AuthResponse, CsvUploadResult, SchemaInfo } from '../types';
 
 // Ensure API URL ends with /api/v1
 const getApiBaseUrl = () => {
@@ -124,7 +124,7 @@ export const datasetApi = {
   /**
    * Get schema for a dataset
    */
-  async getSchema(userId: string, datasetId: string): Promise<any> {
+  async getSchema(userId: string, datasetId: string): Promise<SchemaInfo> {
     const response = await apiClient.get(`/datasets/${userId}/${datasetId}/schema`);
     return response.data;
   },

@@ -53,7 +53,7 @@ export function QueryChat() {
       const response = await queryApi.executeQuery(request);
       attachResponseToTurn(turnId, response);
       setQuestion(''); // Clear input after successful analysis
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Log full error to console for debugging, but show a friendly message to the user
       console.error('Analysis error:', error);
       setError('We couldn\'t analyze your data just now. Please try a slightly different question.');

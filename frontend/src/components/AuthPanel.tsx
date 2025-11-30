@@ -56,11 +56,17 @@ export function AuthPanel({ onAuthenticated, onStartDemo }: AuthPanelProps) {
         setUserId(res.user_id);
         onAuthenticated?.();
       }
-    } catch (err: any) {
-      const msg =
-        err?.response?.data?.detail ||
-        (mode === 'signup' ? 'Sign up failed. Please try again.' : 'Login failed. Please check your credentials.');
-      setError(typeof msg === 'string' ? msg : 'Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      let msg: string;
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { detail?: unknown } } };
+        msg = typeof axiosError.response?.data?.detail === 'string' 
+          ? axiosError.response.data.detail
+          : (mode === 'signup' ? 'Sign up failed. Please try again.' : 'Login failed. Please check your credentials.');
+      } else {
+        msg = mode === 'signup' ? 'Sign up failed. Please try again.' : 'Login failed. Please check your credentials.';
+      }
+      setError(msg);
     } finally {
       setIsSubmitting(false);
     }
