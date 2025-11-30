@@ -79,8 +79,22 @@ describe('queryStore', () => {
       sql: 'SELECT * FROM table',
       results: [],
       visualization: { type: 'table', data: {}, config: {} },
-      analysis: { summary: 'Test' },
-      data_structure: {},
+      analysis: {
+        summary: 'Test summary',
+        key_findings: [],
+        patterns: [],
+        recommendations: [],
+      },
+      data_structure: {
+        row_count: 0,
+        column_count: 0,
+        columns: {},
+        numeric_columns: [],
+        categorical_columns: [],
+        datetime_columns: [],
+        has_time_series: false,
+        cardinality: {},
+      },
     }
     
     useQueryStore.getState().attachResponseToTurn(turnId, mockResponse)
@@ -123,8 +137,8 @@ describe('queryStore', () => {
 
   it('sets datasets', () => {
     const datasets = [
-      { id: 'ds1', name: 'Dataset 1', row_count: 100 },
-      { id: 'ds2', name: 'Dataset 2', row_count: 200 },
+      { dataset_id: 'ds1', name: 'Dataset 1' },
+      { dataset_id: 'ds2', name: 'Dataset 2' },
     ]
     
     useQueryStore.getState().setDatasets(datasets)
