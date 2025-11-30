@@ -65,7 +65,7 @@ export function QueryChat() {
   return (
     <div className="w-full">
       <div className="mb-3">
-        <label className="text-sm font-medium text-si-muted">Ask about your data</label>
+        <label htmlFor="query-input" className="text-sm font-medium text-si-muted">Ask about your data</label>
       </div>
       <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">

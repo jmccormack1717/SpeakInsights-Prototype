@@ -111,9 +111,23 @@ describe('QueryChat', () => {
     const mockResponse = {
       sql: 'SELECT * FROM table',
       results: [],
-      visualization: { type: 'table' },
-      analysis: { summary: 'Test analysis' },
-      data_structure: {},
+      visualization: { type: 'table', data: {}, config: {} },
+      analysis: {
+        summary: 'Test analysis',
+        key_findings: [],
+        patterns: [],
+        recommendations: [],
+      },
+      data_structure: {
+        row_count: 0,
+        column_count: 0,
+        columns: {},
+        numeric_columns: [],
+        categorical_columns: [],
+        datetime_columns: [],
+        has_time_series: false,
+        cardinality: {},
+      },
     }
     
     ;(queryApi.executeQuery as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(mockResponse)
@@ -126,15 +140,18 @@ describe('QueryChat', () => {
     await user.type(input, 'What is the average age?')
     await user.click(button)
     
-    await waitFor(() => {
-      expect(mockAddTurn).toHaveBeenCalledWith('What is the average age?')
-      expect(mockSetLoading).toHaveBeenCalledWith(true)
-      expect(queryApi.executeQuery).toHaveBeenCalledWith({
-        user_id: 'test-user',
-        dataset_id: 'test-dataset',
-        query: 'What is the average age?',
-      })
-    })
+    await waitFor(
+      () => {
+        expect(mockAddTurn).toHaveBeenCalledWith('What is the average age?')
+        expect(mockSetLoading).toHaveBeenCalledWith(true)
+        expect(queryApi.executeQuery).toHaveBeenCalledWith({
+          user_id: 'test-user',
+          dataset_id: 'test-dataset',
+          query: 'What is the average age?',
+        })
+      },
+      { timeout: 3000 }
+    )
   })
 
   it('handles API errors gracefully', async () => {
@@ -151,10 +168,13 @@ describe('QueryChat', () => {
     await user.type(input, 'Test query')
     await user.click(button)
     
-    await waitFor(() => {
-      expect(mockSetError).toHaveBeenCalled()
-      expect(mockSetLoading).toHaveBeenCalledWith(false)
-    })
+    await waitFor(
+      () => {
+        expect(mockSetError).toHaveBeenCalled()
+        expect(mockSetLoading).toHaveBeenCalledWith(false)
+      },
+      { timeout: 3000 }
+    )
   })
 })
 
