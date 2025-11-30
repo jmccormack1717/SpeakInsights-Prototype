@@ -112,6 +112,55 @@ speakinsights-prototype/
 - API docs: `http://localhost:8000/docs`
 - Health check: `http://localhost:8000/health`
 
+### Testing
+
+#### Backend Tests
+
+```bash
+cd backend
+# Install test dependencies (already in requirements.txt)
+pip install -r requirements.txt
+
+# Run all tests
+pytest tests/ -v
+
+# Run with coverage
+pytest tests/ -v --cov=app --cov-report=term-missing
+
+# Run specific test file
+pytest tests/test_playbooks.py -v
+```
+
+#### Frontend Tests
+
+```bash
+cd frontend
+# Install dependencies (if not already done)
+npm install
+
+# Run tests
+npm run test
+
+# Run tests in watch mode
+npm run test -- --watch
+
+# Run tests with UI
+npm run test:ui
+
+# Run tests with coverage
+npm run test:coverage
+```
+
+#### CI/CD
+
+The project includes GitHub Actions workflows that run on every push and pull request:
+- Backend tests with pytest and coverage
+- Frontend tests with Vitest
+- Linting for both backend (flake8, black) and frontend (ESLint)
+- Build verification
+
+See `.github/workflows/ci.yml` for details.
+
 ### Sample / Demo Data
 
 - A cleaned PIMA diabetes CSV is auto-imported on first backend startup for the default user/dataset (`default_user` / `mvp_dataset`).
