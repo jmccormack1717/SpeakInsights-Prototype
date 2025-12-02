@@ -1,21 +1,22 @@
 # SpeakInsights – Natural-Language Data Analysis for Any CSV
 
-SpeakInsights is a personal project and demo app that lets you drop in a CSV file, ask questions in plain English, and get tailored charts and narrative insights. It ships with a cleaned PIMA diabetes dataset and also supports importing your own CSVs.
+SpeakInsights is a full-stack web application that enables natural language data analysis. Simply upload a CSV file, ask questions in plain English, and receive tailored charts and narrative insights. The application includes a built-in PIMA diabetes dataset for instant testing and supports importing your own CSV files.
 
-## 🚀 What This Project Showcases
+## ✨ Features
 
-- **Natural-language queries**: Ask questions in plain English (no SQL or code).
-- **Playbook-driven analysis**: LLM chooses from a toolbox of analysis playbooks (overview, correlation, distributions, relationships, segment comparisons, etc.) instead of generating raw SQL.
-- **Dynamic visualizations**: Histograms, bar charts, scatter plots, correlation views, and more, picked based on intent + data shape.
-- **Built-in demo dataset**: Cleaned PIMA diabetes dataset auto-loaded for instant testing.
-- **Bring-your-own-data**: Upload a CSV (within demo limits) and analyze it with the same tools.
-- **Narrative insights**: LLM explains the findings like a data analyst talking to a business stakeholder.
+- **Natural Language Queries**: Ask questions in plain English—no SQL or coding required
+- **Intelligent Analysis**: LLM-powered playbook system that selects appropriate analysis types (overview, correlation, distributions, relationships, segment comparisons)
+- **Dynamic Visualizations**: Automatically generated charts including histograms, bar charts, scatter plots, correlation matrices, and more
+- **CSV Upload Support**: Import and analyze your own datasets with automatic schema detection
+- **Narrative Insights**: AI-generated explanations that translate data findings into business-friendly language
+- **User Authentication**: Secure user accounts with JWT-based authentication
+- **Live Demo**: Fully deployed and accessible online
 
 ## 🏗️ Architecture (High Level)
 
 - **Backend**: FastAPI (Python, async) + SQLAlchemy + Pandas/Numpy
 - **Frontend**: React + TypeScript + Vite + Tailwind CSS + Recharts
-- **Database**: SQLite per dataset (sufficient for a demo and small/medium CSVs)
+- **Database**: SQLite per dataset (optimized for small to medium-sized datasets)
 - **LLM**: OpenAI model (default: `gpt-4-turbo-preview`, configurable via environment)
 - **Charts**: Recharts implementing a small visualization grammar (bar, histogram, scatter, line, correlation matrix, etc.)
 
@@ -60,19 +61,22 @@ Visit `http://localhost:5173` to use the application.
 speakinsights-prototype/
 ├── backend/
 │   ├── app/
-│   │   ├── api/          # API routes
+│   │   ├── api/          # API routes (FastAPI endpoints)
 │   │   ├── core/         # Core services (LLM, DB, Security)
-│   │   ├── services/     # Business logic
-│   │   └── utils/        # Utilities
-│   ├── data/             # User databases (SQLite)
+│   │   ├── services/     # Business logic (playbooks, analysis)
+│   │   └── utils/        # Utilities (CSV import, schema parsing)
+│   ├── data/             # User databases (SQLite per dataset)
+│   ├── tests/            # Backend test suite
 │   └── requirements.txt
 ├── frontend/
 │   ├── src/
 │   │   ├── components/   # React components
 │   │   ├── services/     # API client
-│   │   ├── stores/       # State management
-│   │   └── types/        # TypeScript types
+│   │   ├── stores/       # State management (Zustand)
+│   │   └── types/        # TypeScript type definitions
 │   └── package.json
+├── .github/
+│   └── workflows/        # CI/CD pipelines
 └── README.md
 ```
 
@@ -84,7 +88,7 @@ speakinsights-prototype/
 - **Key environment variables**:
   - `OPENAI_API_KEY` – OpenAI API key for LLM calls
   - `VITE_API_URL` – Frontend → backend base URL (e.g. Render backend URL)
-- **Note on persistence**: User accounts and datasets are stored in SQLite files on the container filesystem; on free Render tiers this storage is ephemeral, so data may reset on redeploys or restarts.
+- **Note on persistence**: User accounts and datasets are stored in SQLite files on the container filesystem. On free Render tiers, storage is ephemeral and data may reset on redeploys or restarts.
 
 ## 🔄 How It Works (Playbooks, Not Raw SQL)
 
@@ -166,7 +170,9 @@ See `.github/workflows/ci.yml` for details.
 - A cleaned PIMA diabetes CSV is auto-imported on first backend startup for the default user/dataset (`default_user` / `mvp_dataset`).
 - You can also upload your own CSVs via the UI; the backend creates a new SQLite DB per dataset and imports the file using Pandas + SQLAlchemy.
 
-This project is **not** optimized for large-scale / multi-tenant production use; it intentionally focuses on clarity of architecture and code for portfolio / interview purposes.
+### Project Scope
+
+This project is designed as a portfolio piece demonstrating full-stack development, AI integration, and data analysis capabilities. It focuses on clarity of architecture and code quality rather than large-scale production optimization.
 
 ## 📝 License
 

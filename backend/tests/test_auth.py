@@ -175,3 +175,4 @@ class TestJWT:
         assert decoded["email"] == "test@example.com"
         assert "exp" in decoded
 
+

@@ -200,3 +200,4 @@ View coverage reports:
 - Check that all dependencies are committed (package-lock.json, requirements.txt)
 - Run linting manually: `npm run lint` and `flake8 app/`
 
+
